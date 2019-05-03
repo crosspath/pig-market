@@ -6,19 +6,24 @@ struct Date
   def to_s(format : String = "%Y-%m-%d")
     @time.to_utc.to_s(format)
   end
+  
+  def blank?
+    nil?
+  end
 end
 
 struct Int8
   module Lucky
     alias ColumnType = Int8
     include Avram::Type
+    include ::DB::Mappable
 
     def self.from_db!(value : Int8)
       value
     end
 
     def self.parse(value : String)
-      SuccessfulCast(Int8).new value.to_i
+      SuccessfulCast(Int8).new value.to_i8
     rescue ArgumentError
       FailedCast.new
     end
@@ -34,9 +39,15 @@ struct Int8
     class Criteria(T, V) < Avram::Criteria(T, V)
     end
   end
+  
+  def blank?
+    nil?
+  end
 end
 
 module Avram::Migrator::ColumnDefaultHelpers
+  alias ColumnDefaultType2 = Date | Int8
+
   def value_to_string(type : Date.class, value : Date)
     "'#{value}'"
   end
@@ -67,7 +78,7 @@ module Avram::Migrator::ColumnTypeOptionHelpers
 end
 
 class Avram::Migrator::CreateTableStatement
-  def add_column(name, type : ColumnType2, optional = false, reference = nil, on_delete = :do_nothing, default : ColumnDefaultType? = nil, options : NamedTuple? = nil)
+  def add_column(name, type : ColumnType2, optional = false, reference = nil, on_delete = :do_nothing, default : ColumnDefaultType? | ColumnDefaultType2? = nil, options : NamedTuple? = nil)
     if options
       column_type_with_options = column_type(type, **options)
     else

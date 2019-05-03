@@ -6,7 +6,7 @@ class BonusChange < BaseModel
     belongs_to bonus_account : BonusAccount
     belongs_to order : Order?
 
-    column change : Int8
-    column state : Int8
+    column change : Int32
+    column state : Int32
   end
 end

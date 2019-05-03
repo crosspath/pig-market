@@ -1,7 +1,8 @@
 class User < BaseModel
   table :users do
     has_one bonus_account : BonusAccount?
-    has_many addresses : UsersAddress
+    has_many users_addresses : UsersAddress
+    has_many addresses : Address, :users_addresses
 
     column login : String
     column crypted_password : String

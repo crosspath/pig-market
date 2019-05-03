@@ -7,7 +7,7 @@ class Store < BaseModel
     
     belongs_to address : Address
 
-    column type : Int8
+    column type : Int32
     column name : String
   end
 end

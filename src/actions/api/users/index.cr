@@ -1,0 +1,14 @@
+class Api::Users::Index < ApiAction
+  route do
+    users = UserQuery.new.login.asc_order
+    users = users.preload_bonus_account
+    users = users.preload_users_addresses(UsersAddressQuery.new.hidden(false))
+    users = users.preload_addresses
+
+    result = Api::Users::IndexSerializer.new(users)
+
+    response_success(users: result)
+  rescue e
+    response_error(500, e)
+  end
+end

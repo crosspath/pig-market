@@ -98,7 +98,7 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       # before deleting this order
       add_belongs_to order : Order?, on_delete: :restrict
       add change : Int8 # N or -N, where N is a number
-      add state : Int8, default: 0 # Enum: [0: earned, 1: activated, 2: rejected]
+      add state : Int8, default: 0 # Enum: [0: created, 1: activated, 2: rejected]
     end
   end
 
