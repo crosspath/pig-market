@@ -24,3 +24,5 @@ dependencies:
   lucky_flow:
     github: luckyframework/lucky_flow
     version: ~> 0.4
+  dotenv:
+    github: drum445/dotenv

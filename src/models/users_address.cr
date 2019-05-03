@@ -9,6 +9,6 @@ class UsersAddress < BaseModel
     belongs_to user : User
     belongs_to address : Address
     
-    column hidden : Boolean
+    column hidden : Bool
   end
 end

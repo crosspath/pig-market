@@ -8,6 +8,6 @@ class User < BaseModel
     column first_name : String
     column last_name : String
     column full_name : String
-    column birth_date : Date?
+    column birth_date : Time? # Only date
   end
 end
