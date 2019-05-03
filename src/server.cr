@@ -11,4 +11,5 @@ Signal::INT.trap do
   app.close
 end
 
+puts "Listening on #{app.base_uri}"
 app.listen

@@ -14,3 +14,4 @@ server
 /public/mix-manifest.json
 
 .directory
+tmp/*
