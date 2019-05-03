@@ -9,8 +9,8 @@ class Order < BaseModel
 
     column planned_delivery_date : Date?
     column delivered_at : DateTime?
-    column total_cost : Float
-    column total_weight : Float
+    column total_cost : Float64
+    column total_weight : Float64
     column planned_delivery_time_interval : Int8?
   end
 
