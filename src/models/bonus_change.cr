@@ -9,4 +9,10 @@ class BonusChange < BaseModel
     column change : Int16
     column state : Int16
   end
+
+  enum State : Int16
+    Created
+    Activated
+    Rejected
+  end
 end

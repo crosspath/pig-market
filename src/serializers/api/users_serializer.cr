@@ -1,4 +1,4 @@
-class Api::Users::IndexSerializer < Lucky::Serializer
+class Api::UsersSerializer < Lucky::Serializer
   def initialize(@users : Array(User) | UserQuery); end
 
   def render
@@ -13,9 +13,9 @@ class Api::Users::IndexSerializer < Lucky::Serializer
         last_name: u.last_name,
         full_name: u.full_name,
         birth_date: u.birth_date,
-        bonus_account: {
-          amount: ba ? ba.amount : 0
-        },
+        bonus_account: ba ? {
+          amount: ba.amount
+        } : nil,
         addresses: ad.map do |a|
           {
             city: a.city,

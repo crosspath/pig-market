@@ -13,6 +13,14 @@ class Order < BaseModel
     column total_weight : Float64
     column planned_delivery_time_interval : Int16?
   end
+  
+  enum DeliveryTime : Int16
+    Morning
+    Day
+    Evening
+  end
+  
+  DELIVERY_TIME_TEXT = ["08:00-12:00", "10:00-18:00", "18:00-22:00"]
 
   BONUS = 10 # percent
 

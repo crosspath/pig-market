@@ -5,7 +5,7 @@ class Api::Users::Index < ApiAction
     users = users.preload_users_addresses(UsersAddressQuery.new.hidden(false))
     users = users.preload_addresses
 
-    result = Api::Users::IndexSerializer.new(users)
+    result = Api::UsersSerializer.new(users)
 
     response_success(users: result)
   rescue e
