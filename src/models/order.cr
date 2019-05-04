@@ -11,7 +11,7 @@ class Order < BaseModel
     column delivered_at : Time?
     column total_cost : Float64
     column total_weight : Float64
-    column planned_delivery_time_interval : Int32?
+    column planned_delivery_time_interval : Int16?
   end
 
   BONUS = 10 # percent

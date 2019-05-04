@@ -96,7 +96,6 @@ class Db::CreateSampleSeeds < LuckyCli::Task
         }
 
         user = nil
-        puts user_params.inspect
         UserForm.create(user_params) do |form, new_user|
           if new_user
             user_ids << new_user.id
@@ -110,7 +109,7 @@ class Db::CreateSampleSeeds < LuckyCli::Task
           count_of_accounts = DataGenerator.true? ? 1 : 2
 
           boxes = count_of_accounts.times.map do
-            BonusAccountBox.create &.user_id(user_id).amount(bonuses.to_i8)
+            BonusAccountBox.create &.user_id(user_id).amount(bonuses.to_i16)
           end
 
           accounts_hash[user_id] = boxes.map { |x| x.id }.to_a
@@ -161,8 +160,9 @@ class Db::CreateSampleSeeds < LuckyCli::Task
         end
 
         store = StoreBox.create do |a|
-          a.type(DataGenerator.true? ? 0 : 1).name(DataGenerator.name)
-            .address_id(address.id)
+          t = (DataGenerator.true? ? 0 : 1).to_i16
+
+          a.type(t).name(DataGenerator.name).address_id(address.id)
         end
         store_ids << store.id
 
@@ -211,7 +211,7 @@ class Db::CreateSampleSeeds < LuckyCli::Task
             nil
           end
 
-          planned_time = planned_date ? DataGenerator.count : nil
+          planned_time = planned_date ? DataGenerator.count.to_i16 : nil
           planned_time = nil if planned_time && planned_time > 2
 
           total_cost += DataGenerator.count.to_f - 2.0
@@ -228,7 +228,7 @@ class Db::CreateSampleSeeds < LuckyCli::Task
             s = DataGenerator.true? ? store_ids.sample : nil
             g = DataGenerator.shot? ? nil : good.id
             pr = DataGenerator.shot? ? good.price - 0.3 : good.price
-            am = DataGenerator.count
+            am = DataGenerator.count.to_i16
             wm = DataGenerator.price
             w = am * good.weight * (wm - wm.floor + 0.8)
 
@@ -237,15 +237,15 @@ class Db::CreateSampleSeeds < LuckyCli::Task
           end
         end
 
-        if for_user && !accounts_hash[user_id].empty?
+        if for_user && accounts_hash.has_key?(user_id)
           s = DataGenerator.count
           s = 0 if s > 2
 
           ba = accounts_hash[user_id].sample
-          am = DataGenerator.count - 2
+          am = (DataGenerator.count - 2).to_i16
 
           BonusChangeBox.create do |a|
-            a.bonus_account_id(ba).order_id(order.id).change(am).state(s)
+            a.bonus_account_id(ba).order_id(order.id).change(am).state(s.to_i16)
           end
 
           if s == 1 # activated
@@ -265,7 +265,7 @@ class Db::CreateSampleSeeds < LuckyCli::Task
         ba = accounts_hash[user_id].sample
 
         BonusChangeBox.create do |a|
-          am = DataGenerator.count - 2
+          am = (DataGenerator.count - 2).to_i16
           a.bonus_account_id(ba).order_id(nil).change(am).state(2)
         end
       end
@@ -274,7 +274,7 @@ class Db::CreateSampleSeeds < LuckyCli::Task
       30.times do
         GoodsInStoreBox.create do |a|
           a.good_id(good_ids.sample).store_id(store_ids.sample)
-              .amount(DataGenerator.count)
+              .amount(DataGenerator.count.to_i16)
         end
       end
 

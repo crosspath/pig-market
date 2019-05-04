@@ -8,4 +8,13 @@ class UserForm < User::BaseForm
       crypted_password.value = crypto.to_s
     end
   end
+
+  def set_birth_date_from_param(_value)
+    parse_result = Time::Lucky.parse(_value)
+    if parse_result.is_a? Avram::Type::SuccessfulCast
+      birth_date.value = parse_result.value
+    else
+      birth_date.value = nil
+    end
+  end
 end

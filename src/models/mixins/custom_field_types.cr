@@ -12,27 +12,27 @@ struct Date
   end
 end
 
-struct Int8
+struct Int16
   module Lucky
-    alias ColumnType = Int8
+    alias ColumnType = Int16
     include Avram::Type
     include ::DB::Mappable
 
-    def self.from_db!(value : Int8)
+    def self.from_db!(value : Int16)
       value
     end
 
     def self.parse(value : String)
-      SuccessfulCast(Int8).new value.to_i8
+      SuccessfulCast(Int16).new value.to_i16
     rescue ArgumentError
       FailedCast.new
     end
 
-    def self.parse(value : Int8)
-      SuccessfulCast(Int8).new(value)
+    def self.parse(value : Int16)
+      SuccessfulCast(Int16).new(value)
     end
 
-    def self.to_db(value : Int8)
+    def self.to_db(value : Int16)
       value.to_s
     end
 
@@ -46,17 +46,17 @@ struct Int8
 end
 
 module Avram::Migrator::ColumnDefaultHelpers
-  alias ColumnDefaultType2 = Date | Int8
+  alias ColumnDefaultType2 = Date | Int16
 
   def value_to_string(type : Date.class, value : Date)
     "'#{value}'"
   end
 
-  def value_to_string(type : Int8.class, value : Int8 | Int16 | Int32)
+  def value_to_string(type : Int16.class, value : Int16 | Int32)
     "#{value}"
   end
 
-  def default_value(type : Int8.class, default : Int8 | Int16 | Int32)
+  def default_value(type : Int16.class, default : Int16 | Int32)
     " DEFAULT #{value_to_string(type, default)}"
   end
 
@@ -66,13 +66,13 @@ module Avram::Migrator::ColumnDefaultHelpers
 end
 
 module Avram::Migrator::ColumnTypeOptionHelpers
-  alias ColumnType2 = Date.class | Int8.class
+  alias ColumnType2 = Date.class | Int16.class
 
   def column_type(type : Date.class)
     "date"
   end
 
-  def column_type(type : Int8.class)
+  def column_type(type : Int16.class)
     "smallint"
   end
 end
@@ -94,5 +94,39 @@ class Avram::Migrator::CreateTableStatement
       row << default_value(type, default) unless default.nil?
       row << references(reference, on_delete)
     end
+  end
+end
+
+class Avram::Model
+  alias DefaultValueType =
+      Avram::Migrator::ColumnDefaultHelpers::ColumnDefaultType |
+      Avram::Migrator::ColumnDefaultHelpers::ColumnDefaultType2
+
+  macro inherited
+    DEFAULT_VALUES = Hash(Symbol, DefaultValueType).new
+  end
+
+  macro default(hash)
+    #{#% DEFAULT_VALUES.merge!(hash) %}
+    {% for field, value in hash %}
+      DEFAULT_VALUES[{{field}}] = {{value}}
+    {% end %}
+  end
+
+  macro setup_db_mapping
+    DB.mapping({
+      {% for field in FIELDS %}
+        {{field[:name]}}: {
+          {% if field[:type] == Float64.id %}
+            type: PG::Numeric,
+            convertor: Float64Convertor,
+          {% else %}
+            type: {{field[:type]}}::Lucky::ColumnType,
+            default: DEFAULT_VALUES[:{{field[:name]}}].as({{field[:type]}}),
+          {% end %}
+          nilable: {{field[:nilable]}},
+        },
+      {% end %}
+    })
   end
 end

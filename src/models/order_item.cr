@@ -10,6 +10,6 @@ class OrderItem < BaseModel
 
     column price : Float64
     column weight_of_packaged_items : Float64
-    column amount : Int32
+    column amount : Int16
   end
 end

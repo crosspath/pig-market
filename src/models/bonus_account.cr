@@ -9,6 +9,8 @@ class BonusAccount < BaseModel
 
     belongs_to user : User
 
-    column amount : Int8
+    column amount : Int16
+
+    default({:amount => 0})
   end
 end

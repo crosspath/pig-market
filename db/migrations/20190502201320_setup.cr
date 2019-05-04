@@ -37,7 +37,7 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
 
     create BonusAccount::TABLE_NAME do
       add_belongs_to user : User, on_delete: :cascade
-      add amount : Int8, default: 0
+      add amount : Int16, default: 0
     end
 
     create Address::TABLE_NAME do
@@ -54,7 +54,7 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
     end
 
     create Store::TABLE_NAME do
-      add type : Int8, default: 0 # Enum: [0: shop, 1: storehouse|depot]
+      add type : Int16, default: 0 # Enum: [0: shop, 1: storehouse|depot]
       add name : String
       add_belongs_to address : Address, on_delete: :cascade
     end
@@ -73,7 +73,7 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add total_weight : Float
       # Enum: [0: 08:00-12:00, 1: 10:00-18:00, 2: 18:00-22:00];
       # used only for deliveries to users
-      add planned_delivery_time_interval : Int8?, index: true
+      add planned_delivery_time_interval : Int16?, index: true
     end
 
     create OrderItem::TABLE_NAME do
@@ -83,13 +83,13 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add_belongs_to good : Good?, on_delete: :nullify
       add price : Float
       add weight_of_packaged_items : Float
-      add amount : Int8, default: 1
+      add amount : Int16, default: 1
     end
 
     create GoodsInStore::TABLE_NAME do
       add_belongs_to good : Good, on_delete: :cascade
       add_belongs_to store : Store, on_delete: :cascade
-      add amount : Int8, default: 1
+      add amount : Int16, default: 1
     end
 
     create BonusChange::TABLE_NAME do
@@ -97,8 +97,8 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       # Activated bonus should be rejected and order_id should be nullified
       # before deleting this order
       add_belongs_to order : Order?, on_delete: :restrict
-      add change : Int8 # N or -N, where N is a number
-      add state : Int8, default: 0 # Enum: [0: created, 1: activated, 2: rejected]
+      add change : Int16 # N or -N, where N is a number
+      add state : Int16, default: 0 # Enum: [0: created, 1: activated, 2: rejected]
     end
   end
 

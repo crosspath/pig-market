@@ -9,6 +9,6 @@ class GoodsInStore < BaseModel
     belongs_to good : Good
     belongs_to store : Store
     
-    column amount : Int32
+    column amount : Int16
   end
 end
