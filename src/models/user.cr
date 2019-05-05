@@ -1,8 +1,6 @@
 class User < BaseModel
   table :users do
     has_one bonus_account : BonusAccount?
-    has_many users_addresses : UsersAddress
-    has_many addresses : Address, :users_addresses
 
     column login : String
     column crypted_password : String
@@ -10,5 +8,12 @@ class User < BaseModel
     column last_name : String
     column full_name : String
     column birth_date : Time? # Only date
+
+    default({:first_name => "", :last_name => "", :full_name => ""})
+  end
+
+  # polymorphic
+  def addresses
+    
   end
 end

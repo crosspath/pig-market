@@ -2,7 +2,6 @@ class Api::Users::Index < ApiAction
   route do
     users = UserQuery.new.login.asc_order
     users = users.preload_bonus_account
-    users = users.preload_users_addresses(UsersAddressQuery.new.hidden(false))
     users = users.preload_addresses
 
     result = Api::UsersSerializer.new(users)

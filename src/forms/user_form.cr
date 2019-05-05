@@ -7,6 +7,10 @@ class UserForm < User::BaseForm
       crypto = Crypto::Bcrypt::Password.create(password.value.as(String), cost: 10)
       crypted_password.value = crypto.to_s
     end
+
+    if full_name.value.blank?
+      full_name.value = "#{last_name.value} #{first_name.value}"
+    end
   end
 
   def set_birth_date_from_param(_value)

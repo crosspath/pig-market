@@ -1,3 +1,3 @@
 class StoreForm < Store::BaseForm
-  fillable type, name, address_id
+  fillable type, name
 end

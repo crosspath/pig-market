@@ -1,11 +1,11 @@
-require "./delivery_point.cr"
+require "./address.cr"
 
 class Order < BaseModel
   table :orders do
     has_many bonus_changes : BonusChange
-    has_many items : OrderItem
+    has_many order_items : OrderItem
 
-    belongs_to delivery_point : DeliveryPoint
+    belongs_to address : Address
 
     column planned_delivery_date : Time? # Only date
     column delivered_at : Time?

@@ -6,7 +6,8 @@ class Category < BaseModel
     column path : String
     column name : String
     column description : String
-    # Fields marked with "?" may contain empty value (empty string), but not null
+
+    default({:path => "", :description => ""})
   end
 
   def child_path

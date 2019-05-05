@@ -41,32 +41,29 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
     end
 
     create Address::TABLE_NAME do
+      # polymorphic: User or Store
+      add recipient_type : String
+      add recipient_id : Int32, index: true
       add city : String, index: true
       add street : String, default: ""
       add building : String, default: ""
       add additional : String, default: ""
-    end
-
-    create UsersAddress::TABLE_NAME do
-      add_belongs_to user : User, on_delete: :cascade
-      add_belongs_to address : Address, on_delete: :cascade
       add hidden : Bool, default: false
     end
 
     create Store::TABLE_NAME do
       add type : Int16, default: 0 # Enum: [0: shop, 1: storehouse|depot]
       add name : String
-      add_belongs_to address : Address, on_delete: :cascade
     end
 
-    create DeliveryPoint::TABLE_NAME do
-      # polymorphic: UsersAddress or Store
-      add point_type : String
-      add point_id : Int32
+    create GoodsInStore::TABLE_NAME do
+      add_belongs_to good : Good, on_delete: :cascade
+      add_belongs_to store : Store, on_delete: :cascade
+      add amount : Int16, default: 1
     end
 
     create Order::TABLE_NAME do
-      add_belongs_to delivery_point : DeliveryPoint, on_delete: :restrict
+      add_belongs_to address : Address, on_delete: :restrict
       add planned_delivery_date : Date?, index: true
       add delivered_at : Time?, index: true
       add total_cost : Float
@@ -79,16 +76,10 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
     create OrderItem::TABLE_NAME do
       # Before deleting an order all its items should be removed
       add_belongs_to order : Order, on_delete: :restrict
-      add_belongs_to from_store : Store?, on_delete: :nullify
+      add_belongs_to store : Store?, on_delete: :nullify
       add_belongs_to good : Good?, on_delete: :nullify
       add price : Float
       add weight_of_packaged_items : Float
-      add amount : Int16, default: 1
-    end
-
-    create GoodsInStore::TABLE_NAME do
-      add_belongs_to good : Good, on_delete: :cascade
-      add_belongs_to store : Store, on_delete: :cascade
       add amount : Int16, default: 1
     end
 
@@ -105,12 +96,10 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
   def rollback
     [
       BonusChange::TABLE_NAME,
-      GoodsInStore::TABLE_NAME,
       OrderItem::TABLE_NAME,
       Order::TABLE_NAME,
-      DeliveryPoint::TABLE_NAME,
+      GoodsInStore::TABLE_NAME,
       Store::TABLE_NAME,
-      UsersAddress::TABLE_NAME,
       Address::TABLE_NAME,
       BonusAccount::TABLE_NAME,
       User::TABLE_NAME,

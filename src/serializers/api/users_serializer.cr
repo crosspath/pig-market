@@ -21,7 +21,8 @@ class Api::UsersSerializer < Lucky::Serializer
             city: a.city,
             street: a.street,
             building: a.building,
-            additional: a.additional
+            additional: a.additional,
+            hidden: a.hidden
           }
         end
       }

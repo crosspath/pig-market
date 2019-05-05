@@ -10,5 +10,7 @@ class GoodsInStore < BaseModel
     belongs_to store : Store
     
     column amount : Int16
+
+    default({:amount => 1})
   end
 end

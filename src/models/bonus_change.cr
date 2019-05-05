@@ -8,6 +8,8 @@ class BonusChange < BaseModel
 
     column change : Int16
     column state : Int16
+
+    default({:state => 0}) # Created
   end
 
   enum State : Int16
