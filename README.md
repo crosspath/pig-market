@@ -20,6 +20,10 @@ List users:
 
     http://localhost:3001/api/users?api_key=any-string
 
+User info, addresses and orders (replace `123` with a user id):
+
+    http://localhost:3001/api/users/123?api_key=any-string
+
 Earned bonuses for a user (replace `123` with a user id):
 
     http://localhost:3001/api/users/123/bonuses?api_key=any-string
@@ -39,4 +43,28 @@ List goods:
 More info about selected goods (replace `123` with a goods id):
 
     http://localhost:3001/api/goods/123?api_key=any-string
+
+List categories:
+
+    http://localhost:3001/api/categories?api_key=any-string
+
+List goods in selected category and nested categories (replace `123` with a category id):
+
+    http://localhost:3001/api/categories/123?api_key=any-string
+
+List orders:
+
+    http://localhost:3001/api/orders?api_key=any-string
+
+Order info (replace `123` with an order id):
+
+    http://localhost:3001/api/orders/123?api_key=any-string
+
+List stores:
+
+    http://localhost:3001/api/stores?api_key=any-string
+
+Goods in selected store (replace `123` with a store id):
+
+    http://localhost:3001/api/stores/123?api_key=any-string
 

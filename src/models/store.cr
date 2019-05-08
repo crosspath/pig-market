@@ -2,6 +2,7 @@ class Store < BaseModel
   table :stores do
     has_many order_items : OrderItem
     has_many goods_in_stores : GoodsInStore
+    has_many goods : Good, :goods_in_stores
     
     column type : Int16
     column name : String

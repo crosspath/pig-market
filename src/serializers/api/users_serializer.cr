@@ -18,6 +18,7 @@ class Api::UsersSerializer < Lucky::Serializer
         } : nil,
         addresses: ad.map do |a|
           {
+            id: a.id,
             city: a.city,
             street: a.street,
             building: a.building,
