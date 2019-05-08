@@ -7,8 +7,8 @@ class Api::OrderSerializer < Lucky::Serializer
       address_id: @order.address_id,
       planned_delivery_date: @order.planned_delivery_date,
       delivered_at: @order.delivered_at,
-      total_cost: @order.total_cost,
-      total_weight: @order.total_weight,
+      total_cost: @order.total_cost.round(2),
+      total_weight: @order.total_weight.round(2),
       planned_delivery_time_interval: @order.planned_delivery_time_interval,
     }
 
@@ -25,9 +25,9 @@ class Api::OrderSerializer < Lucky::Serializer
             id: a.id,
             store_id: a.store_id,
             good_id: a.good_id,
-            price: a.price,
+            price: a.price.round(2),
             amount: a.amount,
-            weight_of_packaged_items: a.weight_of_packaged_items
+            weight_of_packaged_items: a.weight_of_packaged_items.round(2)
           }
         end
       })

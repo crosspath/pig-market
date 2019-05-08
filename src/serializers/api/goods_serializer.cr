@@ -8,8 +8,8 @@ class Api::GoodsSerializer < Lucky::Serializer
         id: u.id,
         name: u.name,
         description: u.description,
-        price: u.price,
-        weight: u.weight,
+        price: u.price.round(2),
+        weight: u.weight.round(2),
         unit: unit ? {
           id: unit.id,
           name: unit.name

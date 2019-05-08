@@ -7,6 +7,9 @@ class Api::GoodSerializer < Lucky::Serializer
     {
       id: @good.id,
       name: @good.name,
+      description: @good.description,
+      price: @good.price.round(2),
+      weight: @good.weight.round(2),
       unit: unit ? {
         id: unit.id,
         name: unit.name

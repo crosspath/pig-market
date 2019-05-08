@@ -8,13 +8,17 @@ class Api::Categories::Show < ApiAction
       "path like ? or path = ?",
       "#{child_path}.%",
       child_path
-    ).results
+    ).path.asc_order.results
 
-    parents = parent_ids ? CategoryQuery.new.id.in(parent_ids) : [] of Category
+    parents = if parent_ids
+      CategoryQuery.new.id.in(parent_ids).path.asc_order
+    else
+      [] of Category
+    end
 
     category_ids = ([category_id.to_i] + nested.map(&.id).to_a).join(", ")
     goods = GoodQuery.new.join_goods_categories.where("category_id in (#{category_ids})")
-    puts goods.to_sql
+    goods = goods.distinct.name.asc_order
 
     result = Api::CategorySerializer.new(category, nested, parents, goods)
 
