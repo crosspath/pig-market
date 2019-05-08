@@ -10,7 +10,8 @@ class Db::CreateSampleSeeds < LuckyCli::Task
 
   def call
     category_ids   = [] of Int32
-    category_paths = [] of String
+    category_path1 = [] of String
+    category_path2 = [] of String
     unit_ids       = [] of Int32
     good_ids       = [] of Int32
     user_ids       = [] of Int32
@@ -23,18 +24,27 @@ class Db::CreateSampleSeeds < LuckyCli::Task
       puts "Creating categories"
       10.times do
         category = CategoryBox.create do |a|
-          path = if DataGenerator.true? && !category_paths.empty?
-            category_paths.sample
-          else
+          path = case DataGenerator.count
+          when 0..1
             ""
+          when 2..3
+            category_path1.empty? ? "" : category_path1.sample
+          else
+            category_path2.empty? ? "" : category_path2.sample
           end
           a.path(path).name(DataGenerator.name).description(DataGenerator.text)
         end
-        category_paths << category.child_path
+
+        if category.path.empty?
+          category_path1 << category.child_path
+        else
+          category_path2 << category.child_path
+        end
+
         category_ids << category.id
       end
       
-      if category_paths.empty? || category_ids.empty?
+      if category_ids.empty?
         puts "Unexpected behaviour: no categories created"
         break
       end
@@ -84,7 +94,7 @@ class Db::CreateSampleSeeds < LuckyCli::Task
         end
 
         z = [DataGenerator.count, 2].max.times.map { DataGenerator.name }.to_a
-        bd = DataGenerator.shot? ? nil : Time.utc
+        bd = DataGenerator.true? ? nil : Time.utc.shift(days: DataGenerator.count * 20)
 
         user_params = {
           "login"      => login,
@@ -103,7 +113,7 @@ class Db::CreateSampleSeeds < LuckyCli::Task
           end
         end
 
-        if user && DataGenerator.true?
+        if user && !DataGenerator.shot?
           user_id = user.as(User).id
           bonuses = DataGenerator.true? ? 0 : 100
           count_of_accounts = DataGenerator.true? ? 1 : 2
@@ -122,29 +132,19 @@ class Db::CreateSampleSeeds < LuckyCli::Task
       end
 
       puts "Creating user addresses"
-      15.times do
+      20.times do
+        user_id = user_ids.sample
+
         address = AddressBox.create do |a|
           z = 4.times.map { DataGenerator.name }.to_a
-          a.city(z[0]).street(z[1]).building(z[2]).additional(z[3])
+          h = DataGenerator.true?
+
+          a.city(z[0]).street(z[1]).building(z[2]).additional(z[3]).hidden(h)
+              .recipient_id(user_id).recipient_type("User")
         end
 
-        count_of_ua = DataGenerator.shot? ? 2 : 1
-        count_of_ua.times do
-          user_id = user_ids.sample
-
-          ua = UsersAddressBox.create do |a|
-            a.user_id(user_id).address_id(address.id)
-                .hidden(DataGenerator.shot?)
-          end
-
-          if DataGenerator.true?
-            dp = DeliveryPointBox.create do |a|
-              a.point_type("UsersAddress").point_id(ua.id)
-            end
-            user_dp_hash[user_id] ||= [] of Int32
-            user_dp_hash[user_id] << dp.id
-          end
-        end
+        user_dp_hash[user_id] ||= [] of Int32
+        user_dp_hash[user_id] << address.id
       end
 
       if user_dp_hash.empty?
@@ -154,25 +154,23 @@ class Db::CreateSampleSeeds < LuckyCli::Task
 
       puts "Creating stores"
       12.times do
-        address = AddressBox.create do |a|
-          z = 4.times.map { DataGenerator.name }.to_a
-          a.city(z[0]).street(z[1]).building(z[2]).additional(z[3])
-        end
-
         store = StoreBox.create do |a|
           t = (DataGenerator.true? ? 0 : 1).to_i16
 
-          a.type(t).name(DataGenerator.name).address_id(address.id)
+          a.type(t).name(DataGenerator.name)
         end
         store_ids << store.id
 
-        2.times do
-          unless DataGenerator.true?
-            dp = DeliveryPointBox.create do |a|
-              a.point_type("Store").point_id(store.id)
-            end
-            store_dp_ids << dp.id
+        (DataGenerator.shot? ? 2 : 1).times do
+          address = AddressBox.create do |a|
+            z = 4.times.map { DataGenerator.name }.to_a
+            h = DataGenerator.true?
+
+            a.city(z[0]).street(z[1]).building(z[2]).additional(z[3]).hidden(h)
+                .recipient_id(store.id).recipient_type("Store")
           end
+          
+          store_dp_ids << address.id
         end
       end
 
@@ -182,7 +180,7 @@ class Db::CreateSampleSeeds < LuckyCli::Task
       end
 
       puts "Creating orders"
-      20.times do
+      24.times do
         for_user = DataGenerator.true?
 
         if for_user
@@ -217,7 +215,7 @@ class Db::CreateSampleSeeds < LuckyCli::Task
           total_cost += DataGenerator.count.to_f - 2.0
           total_weight += DataGenerator.count.to_f
 
-          a.delivery_point_id(dp).planned_delivery_date(planned_date)
+          a.address_id(dp).planned_delivery_date(planned_date)
               .delivered_at(actual_ts)
               .total_cost(total_cost).total_weight(total_weight)
               .planned_delivery_time_interval(planned_time)
@@ -232,24 +230,30 @@ class Db::CreateSampleSeeds < LuckyCli::Task
             wm = DataGenerator.price
             w = am * good.weight * (wm - wm.floor + 0.8)
 
-            a.order_id(order.id).from_store_id(s).good_id(g).price(pr)
+            a.order_id(order.id).store_id(s).good_id(g).price(pr)
                 .weight_of_packaged_items(w).amount(am)
           end
         end
 
         if for_user && accounts_hash.has_key?(user_id)
-          s = DataGenerator.count
-          s = 0 if s > 2
+          s = DataGenerator.true? ? 0 : 1
 
           ba = accounts_hash[user_id].sample
-          am = (DataGenerator.count - 2).to_i16
+          am = DataGenerator.true? ? order.bonus_amount : 0
+          account = BonusAccountQuery.new.find(ba)
+
+          if am == 0
+            loop do
+              am = DataGenerator.count - 2
+              break if account.amount + am >= 0 && am != 0
+            end
+          end
 
           BonusChangeBox.create do |a|
-            a.bonus_account_id(ba).order_id(order.id).change(am).state(s.to_i16)
+            a.bonus_account_id(ba).order_id(order.id).change(am.to_i16).state(s.to_i16)
           end
 
           if s == 1 # activated
-            account = BonusAccountQuery.new.find(ba)
             account_params = {"amount" => (account.amount + am).to_s}
 
             BonusAccountForm.update(account, account_params) do |f, b|
