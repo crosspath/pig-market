@@ -1,6 +1,12 @@
 class Api::CategorySerializer < Lucky::Serializer
   alias ManyRecords = CategoryQuery | Array(Category)
-  def initialize(@category : Category, @nested : ManyRecords, @parents : ManyRecords); end
+
+  def initialize(
+    @category : Category,
+    @nested : ManyRecords,
+    @parents : ManyRecords,
+    @goods : Array(Good) | GoodQuery
+  ); end
 
   def render
     {
@@ -8,7 +14,7 @@ class Api::CategorySerializer < Lucky::Serializer
       name: @category.name,
       path: @category.path,
       description: @category.description,
-      goods: @category.goods.map do |u|
+      goods: @goods.map do |u|
         {
           id: u.id,
           name: u.name
