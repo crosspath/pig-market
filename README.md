@@ -4,13 +4,17 @@ Test project for learning Crystal / PostgreSQL / JavaScript.
 
 ### Setting up the project
 
-1. Install [Crystal](https://crystal-lang.org/reference/installation/)
+1. Install [Crystal](https://crystal-lang.org/reference/installation/), [PostgreSQL](https://www.postgresql.org/download/), `libyaml-dev` (if you're using Linux)
 2. Install [Lucky Framework](http://luckyframework.org/guides/installing.html)
 3. Create database
-4. Copy `.env.template` to `.env` and replace there `DATABASE_URL` and `API_KEY`
-5. Run `lucky db.migrate` to create tables in the database
-6. Run `lucky db.create_sample_seeds` to generate sample rows
-7. Run `lucky dev` to start the app
+4. Copy `.env.template` to `.env` and replace here `DATABASE_URL` and `API_KEY`
+5. Run `shards install` to download required libraries
+6. Run `lucky db.migrate` to create tables in the database
+7. Run `lucky db.create_sample_seeds` to generate sample rows. If you don't need running application, you may skip next steps.
+8. Install [Node.js](https://nodejs.org/en/download/package-manager/) (tested on v12), [Yarn](https://yarnpkg.com/en/docs/install)
+9. Install [Forego](https://dl.equinox.io/ddollar/forego/stable), or [Foreman](https://github.com/ddollar/foreman), or [Overmind](https://github.com/DarthSim/overmind), or [Hivemind](https://github.com/DarthSim/hivemind)
+10. Run `yarn install` to download required libraries
+11. Run `lucky dev` to start the app
 
 ## Usage
 
