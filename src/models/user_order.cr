@@ -1,17 +1,22 @@
-require "./address.cr"
+require "./bonus_change.cr"
 
-class Order < BaseModel
-  table :orders do
-    has_many bonus_changes : BonusChange
-    has_many order_items : OrderItem
+class UserOrder < BaseModel
+  table :user_orders do
+    # TODO: has_many_polymorphic order_items : OrderItem, :order
 
-    belongs_to address : Address
+    belongs_to bonus_change : BonusChange
 
+    # TODO: polymorphic delivery_point : UserStoreDeliveryPoint | UserAddressDeliveryPoint
+    column delivery_point_type : String
+    column delivery_point_id : Int32
     column planned_delivery_date : Time? # Only date
     column delivered_at : Time?
     column total_cost : Float64
     column total_weight : Float64
     column planned_delivery_time_interval : Int16?
+    column used_bonuses : Int32
+    
+    default({:used_bonuses => 0})
   end
   
   enum DeliveryTime : Int16

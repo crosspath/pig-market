@@ -1,5 +1,6 @@
 class OrderItemBox < Avram::Box
   def initialize
+    order_type "UserOrder"
     order_id 0
     store_id 0
     good_id 0

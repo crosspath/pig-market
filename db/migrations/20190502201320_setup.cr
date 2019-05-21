@@ -33,27 +33,21 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add last_name : String, default: ""
       add full_name : String, default: ""
       add birth_date : Date?
-    end
-
-    create BonusAccount::TABLE_NAME do
-      add_belongs_to user : User, on_delete: :cascade
-      add amount : Int16, default: 0
+      add bonuses : Int32, default: 0
+      add role : Int16, default: 0 # Enum: [0: customer, 1: worker]
     end
 
     create Address::TABLE_NAME do
-      # polymorphic: User or Store
-      add recipient_type : String
-      add recipient_id : Int32, index: true
       add city : String, index: true
       add street : String, default: ""
       add building : String, default: ""
-      add additional : String, default: ""
-      add hidden : Bool, default: false
     end
 
     create Store::TABLE_NAME do
       add type : Int16, default: 0 # Enum: [0: shop, 1: storehouse|depot]
       add name : String
+      add_belongs_to address : Address
+      add address_notes : String, default: ""
     end
 
     create GoodsInStore::TABLE_NAME do
@@ -62,20 +56,40 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add amount : Int16, default: 1
     end
 
-    create Order::TABLE_NAME do
-      add_belongs_to address : Address, on_delete: :restrict
+    create BonusChange::TABLE_NAME do
+      # Activated bonus should be rejected and order_id should be nullified
+      # before deleting this order
+      add change : Int16 # N or -N, where N is a number
+      add state : Int16, default: 0 # Enum: [0: created, 1: activated, 2: rejected]
+    end
+    
+    create StoreOrder::TABLE_NAME do
+      add_belongs_to store : Store, on_delete: :restrict
       add planned_delivery_date : Date?, index: true
       add delivered_at : Time?, index: true
       add total_cost : Float
       add total_weight : Float
-      # Enum: [0: 08:00-12:00, 1: 10:00-18:00, 2: 18:00-22:00];
-      # used only for deliveries to users
+    end
+
+    create UserOrder::TABLE_NAME do
+      # Polymorphic: UserStoreDeliveryPoint, UserAddressDeliveryPoint
+      add delivery_point_type : String
+      add delivery_point_id : Int32
+      add planned_delivery_date : Date?, index: true
+      add delivered_at : Time?, index: true
+      add total_cost : Float
+      add total_weight : Float
+      # Enum: [0: 08:00-12:00, 1: 10:00-18:00, 2: 18:00-22:00]
       add planned_delivery_time_interval : Int16?, index: true
+      add used_bonuses : Int32, default: 0
+      add_belongs_to bonus_change : BonusChange
     end
 
     create OrderItem::TABLE_NAME do
       # Before deleting an order all its items should be removed
-      add_belongs_to order : Order, on_delete: :restrict
+      # Polymorphic: StoreOrder, UserOrder
+      add order_type : String
+      add order_id : Int32
       add_belongs_to store : Store?, on_delete: :nullify
       add_belongs_to good : Good?, on_delete: :nullify
       add price : Float
@@ -83,25 +97,31 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add amount : Int16, default: 1
     end
 
-    create BonusChange::TABLE_NAME do
-      add_belongs_to bonus_account : BonusAccount, on_delete: :cascade
-      # Activated bonus should be rejected and order_id should be nullified
-      # before deleting this order
-      add_belongs_to order : Order?, on_delete: :restrict
-      add change : Int16 # N or -N, where N is a number
-      add state : Int16, default: 0 # Enum: [0: created, 1: activated, 2: rejected]
+    create UserStoreDeliveryPoint::TABLE_NAME do
+      add_belongs_to user : User
+      add_belongs_to store : Store
+      add hidden : Bool, default: false
+    end
+
+    create UserAddressDeliveryPoint::TABLE_NAME do
+      add_belongs_to user : User
+      add_belongs_to address : Address
+      add address_notes : String, default: ""
+      add hidden : Bool, default: false
     end
   end
 
   def rollback
     [
-      BonusChange::TABLE_NAME,
+      UserAddressDeliveryPoint::TABLE_NAME,
+      UserStoreDeliveryPoint::TABLE_NAME,
       OrderItem::TABLE_NAME,
-      Order::TABLE_NAME,
+      UserOrder::TABLE_NAME,
+      StoreOrder::TABLE_NAME,
+      BonusChange::TABLE_NAME,
       GoodsInStore::TABLE_NAME,
       Store::TABLE_NAME,
       Address::TABLE_NAME,
-      BonusAccount::TABLE_NAME,
       User::TABLE_NAME,
       GoodsCategory::TABLE_NAME,
       Good::TABLE_NAME,

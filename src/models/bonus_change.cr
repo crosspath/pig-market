@@ -1,10 +1,6 @@
-require "./bonus_account.cr"
-require "./order.cr"
-
 class BonusChange < BaseModel
   table :bonus_changes do
-    belongs_to bonus_account : BonusAccount
-    belongs_to order : Order?
+    has_many user_orders : UserOrder
 
     column change : Int16
     column state : Int16

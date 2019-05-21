@@ -7,5 +7,7 @@ class UserBox < Avram::Box
     last_name ""
     full_name ""
     birth_date Time.utc
+    bonuses 0
+    role 0
   end
 end
