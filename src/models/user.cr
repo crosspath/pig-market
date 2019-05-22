@@ -14,4 +14,9 @@ class User < BaseModel
 
     default({:first_name => "", :last_name => "", :full_name => "", :bonuses => 0, :role => 0})
   end
+  
+  enum UserRole : Int16
+    Customer
+    Worker
+  end
 end

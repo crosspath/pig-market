@@ -1,3 +1,5 @@
+require "./address.cr"
+
 class Store < BaseModel
   table :stores do
     has_many order_items : OrderItem

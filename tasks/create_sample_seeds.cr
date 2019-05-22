@@ -8,17 +8,36 @@ require "../spec/support/data_generator.cr"
 class Db::CreateSampleSeeds < LuckyCli::Task
   summary "Add sample database records helpful for development"
 
+  private def create_order_items(order, goods, store_ids)
+    goods.each do |good|
+      OrderItemBox.create do |a|
+        s = DataGenerator.true? ? store_ids.sample : nil
+        g = DataGenerator.shot? ? nil : good.id
+        pr = DataGenerator.shot? ? good.price - 0.3 : good.price
+        am = DataGenerator.count.to_i16
+        wm = DataGenerator.price
+        w = am * good.weight * (wm - wm.floor + 0.8)
+
+        a.order_type(order.class.name).order_id(order.id).store_id(s).good_id(g)
+            .price(pr).weight_of_packaged_items(w).amount(am)
+      end
+    end
+  end
+
   def call
     category_ids   = [] of Int32
     category_path1 = [] of String
     category_path2 = [] of String
     unit_ids       = [] of Int32
     good_ids       = [] of Int32
-    user_ids       = [] of Int32
-    accounts_hash  = Hash(Int32, Array(Int32)).new # user_id => [account_id]
-    user_dp_hash   = Hash(Int32, Array(Int32)).new # user_id => [delivery_point_id]
+    customer_ids   = [] of Int32
+    worker_ids     = [] of Int32
+    address_ids    = [] of Int32
     store_ids      = [] of Int32
-    store_dp_ids   = [] of Int32
+
+    user_d_points  = Hash(Int32, Array(Tuple(String, Int32))).new do |hash, key|
+      hash[key] = [] of Tuple(String, Int32)
+    end
 
     Avram::Repo.transaction do
       puts "Creating categories"
@@ -102,52 +121,40 @@ class Db::CreateSampleSeeds < LuckyCli::Task
           "first_name" => z.first,
           "last_name"  => z.last,
           "full_name"  => z.join(" "),
-          "birth_date" => bd ? bd.to_rfc3339 : ""
+          "birth_date" => bd ? bd.to_rfc3339 : "",
+          "role"       => DataGenerator.true? ? 0 : 1
         }
 
         user = nil
         UserForm.create(user_params) do |form, new_user|
           if new_user
-            user_ids << new_user.id
+            if new_user.role.value == 0
+              customer_ids << new_user.id
+            else
+              worker_ids << new_user.id
+            end
             user = new_user
           end
         end
-
-        if user && !DataGenerator.shot?
-          user_id = user.as(User).id
-          bonuses = DataGenerator.true? ? 0 : 100
-          count_of_accounts = DataGenerator.true? ? 1 : 2
-
-          boxes = count_of_accounts.times.map do
-            BonusAccountBox.create &.user_id(user_id).amount(bonuses.to_i16)
-          end
-
-          accounts_hash[user_id] = boxes.map { |x| x.id }.to_a
-        end
       end
 
-      if user_ids.empty? || accounts_hash.empty?
+      if customer_ids.empty? && worker_ids.empty?
         puts "Unexpected behaviour: no users created"
         break
       end
 
-      puts "Creating user addresses"
+      puts "Creating addresses"
       20.times do
-        user_id = user_ids.sample
-
         address = AddressBox.create do |a|
-          z = 4.times.map { DataGenerator.name }.to_a
-          h = DataGenerator.true?
+          z = 3.times.map { DataGenerator.name }.to_a
 
-          a.city(z[0]).street(z[1]).building(z[2]).additional(z[3]).hidden(h)
-              .recipient_id(user_id).recipient_type("User")
+          a.city(z[0]).street(z[1]).building(z[2])
         end
 
-        user_dp_hash[user_id] ||= [] of Int32
-        user_dp_hash[user_id] << address.id
+        address_ids << address.id
       end
 
-      if user_dp_hash.empty?
+      if address_ids.empty?
         puts "Unexpected behaviour: no user addresses created"
         break
       end
@@ -158,45 +165,33 @@ class Db::CreateSampleSeeds < LuckyCli::Task
           t = (DataGenerator.true? ? 0 : 1).to_i16
 
           a.type(t).name(DataGenerator.name)
+              .address_id(address_ids.sample).address_notes(DataGenerator.name)
         end
         store_ids << store.id
-
-        (DataGenerator.shot? ? 2 : 1).times do
-          address = AddressBox.create do |a|
-            z = 4.times.map { DataGenerator.name }.to_a
-            h = DataGenerator.true?
-
-            a.city(z[0]).street(z[1]).building(z[2]).additional(z[3]).hidden(h)
-                .recipient_id(store.id).recipient_type("Store")
-          end
-          
-          store_dp_ids << address.id
-        end
       end
 
-      if store_ids.empty? || store_dp_ids.empty?
+      if store_ids.empty?
         puts "Unexpected behaviour: no stores created"
         break
       end
 
-      puts "Creating orders"
-      24.times do
-        for_user = DataGenerator.true?
-
-        if for_user
-          user_id = user_dp_hash.keys.sample
-          dp = user_dp_hash[user_id].sample
-        else
-          user_id = nil
-          dp = store_dp_ids.sample
+      puts "Creating goods in stores"
+      30.times do
+        GoodsInStoreBox.create do |a|
+          a.good_id(good_ids.sample).store_id(store_ids.sample)
+              .amount(DataGenerator.count.to_i16)
         end
+      end
 
+      puts "Creating user orders"
+      10.times do
+        user_id = customer_ids.sample
         select_good_ids = DataGenerator.count.times.map { good_ids.sample }.to_a
         goods = GoodQuery.new.id.in(select_good_ids)
         total_cost = goods.reduce(0.0) { |acc, el| acc + el.price }
         total_weight = goods.reduce(0.0) { |acc, el| acc + el.weight }
 
-        order = OrderBox.create do |a|
+        order = UserOrderBox.create do |a|
           planned_date = if DataGenerator.shot?
             nil
           else
@@ -215,71 +210,90 @@ class Db::CreateSampleSeeds < LuckyCli::Task
           total_cost += DataGenerator.count.to_f - 2.0
           total_weight += DataGenerator.count.to_f
 
-          a.address_id(dp).planned_delivery_date(planned_date)
-              .delivered_at(actual_ts)
-              .total_cost(total_cost).total_weight(total_weight)
+          dp_type = ""
+          dp_id   = 0
+
+          if user_d_points[user_id].empty? || DataGenerator.true?
+            dp = if DataGenerator.true?
+              UserStoreDeliveryPointBox.create do |q|
+                q.user_id(user_id).store_id(store_ids.sample).hidden(DataGenerator.true?)
+              end
+            else
+              UserAddressDeliveryPointBox.create do |q|
+                q.user_id(user_id).address_id(address_ids.sample)
+                    address_notes(DataGenerator.name).hidden(DataGenerator.true?)
+              end
+            end
+            dp_type = dp.class.name
+            dp_id   = dp.id
+
+            user_d_points[user_id] << {dp_type, dp_id}
+          else
+            dp_type, dp_id = user_d_points[user_id].sample
+          end
+
+          if DataGenerator.shot?
+            ub = 0
+            bc_id = nil
+          else
+            user = User.find(user_id)
+            ub   = DataGenerator.true? ? [user.bonuses, DataGenerator.count].max : 0
+
+            bc = BonusChangeBox.create do |q|
+              q.change(UserOrder.bonus_amount(total_cost)).state(DataGenerator.count % 3)
+            end
+            bc_id = bc.id
+
+            if bc.state.value == 1
+              user_params = {"bonuses" => (account.amount + am).to_s}
+
+              UserForm.update(user, user_params) do |f, b|
+                raise "Not updated: UserForm, #{user_id}" unless b
+              end
+            end
+          end
+
+          a.delivery_point_type(dp_type).delivery_point_id(dp_id)
+              .planned_delivery_date(planned_date).delivered_at(actual_ts)
+              .total_cost(total_cost - ub).total_weight(total_weight)
               .planned_delivery_time_interval(planned_time)
+              .bonus_change_id(bc_id).used_bonuses(ub)
         end
 
-        goods.each do |good|
-          OrderItemBox.create do |a|
-            s = DataGenerator.true? ? store_ids.sample : nil
-            g = DataGenerator.shot? ? nil : good.id
-            pr = DataGenerator.shot? ? good.price - 0.3 : good.price
-            am = DataGenerator.count.to_i16
-            wm = DataGenerator.price
-            w = am * good.weight * (wm - wm.floor + 0.8)
-
-            a.order_id(order.id).store_id(s).good_id(g).price(pr)
-                .weight_of_packaged_items(w).amount(am)
-          end
-        end
-
-        if for_user && accounts_hash.has_key?(user_id)
-          s = DataGenerator.true? ? 0 : 1
-
-          ba = accounts_hash[user_id].sample
-          am = DataGenerator.true? ? order.bonus_amount : 0
-          account = BonusAccountQuery.new.find(ba)
-
-          if am == 0
-            loop do
-              am = DataGenerator.count - 2
-              break if account.amount + am >= 0 && am != 0
-            end
-          end
-
-          BonusChangeBox.create do |a|
-            a.bonus_account_id(ba).order_id(order.id).change(am.to_i16).state(s.to_i16)
-          end
-
-          if s == 1 # activated
-            account_params = {"amount" => (account.amount + am).to_s}
-
-            BonusAccountForm.update(account, account_params) do |f, b|
-              raise "Not updated: BonusAccountForm, #{ba}" unless b
-            end
-          end
-        end
-      end
-      
-      puts "Creating rejected bonuses"
-      5.times do
-        user_id = accounts_hash.keys.sample
-        ba = accounts_hash[user_id].sample
-
-        BonusChangeBox.create do |a|
-          am = (DataGenerator.count - 2).to_i16
-          a.bonus_account_id(ba).order_id(nil).change(am).state(2)
-        end
+        create_order_items(order, goods, store_ids)
       end
 
-      puts "Creating goods in stores"
-      30.times do
-        GoodsInStoreBox.create do |a|
-          a.good_id(good_ids.sample).store_id(store_ids.sample)
-              .amount(DataGenerator.count.to_i16)
+      puts "Creating store orders"
+      10.times do
+        user_id = worker_ids.sample
+        select_good_ids = DataGenerator.count.times.map { good_ids.sample }.to_a
+        goods = GoodQuery.new.id.in(select_good_ids)
+        total_cost = goods.reduce(0.0) { |acc, el| acc + el.price }
+        total_weight = goods.reduce(0.0) { |acc, el| acc + el.weight }
+        store = store_ids.sample
+
+        order = StoreOrderBox.create do |a|
+          planned_date = if DataGenerator.shot?
+            nil
+          else
+            Time.utc.shift(days: DataGenerator.count)
+          end
+
+          actual_ts = if planned_date && DataGenerator.true?
+            planned_date.shift(days: DataGenerator.count - 2)
+          else
+            nil
+          end
+
+          total_cost += DataGenerator.count.to_f - 2.0
+          total_weight += DataGenerator.count.to_f
+
+          a.store_id(store).user_id(user_id)
+              .planned_delivery_date(planned_date).delivered_at(actual_ts)
+              .total_cost(total_cost - ub).total_weight(total_weight)
         end
+
+        create_order_items(order, goods, store_ids)
       end
 
       true

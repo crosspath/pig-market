@@ -1,5 +1,5 @@
 class UserForm < User::BaseForm
-  fillable login, first_name, last_name, full_name, birth_date
+  fillable login, first_name, last_name, full_name, birth_date, bonuses, role
   virtual password : String
 
   def prepare

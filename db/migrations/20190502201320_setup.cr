@@ -64,6 +64,7 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
     end
     
     create StoreOrder::TABLE_NAME do
+      add_belongs_to user : User, on_delete: :restrict
       add_belongs_to store : Store, on_delete: :restrict
       add planned_delivery_date : Date?, index: true
       add delivered_at : Time?, index: true

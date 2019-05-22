@@ -1,4 +1,6 @@
 require "./bonus_change.cr"
+require "./user_address_delivery_point.cr"
+require "./user_store_delivery_point.cr"
 
 class UserOrder < BaseModel
   table :user_orders do
@@ -6,9 +8,10 @@ class UserOrder < BaseModel
 
     belongs_to bonus_change : BonusChange
 
-    # TODO: polymorphic delivery_point : UserStoreDeliveryPoint | UserAddressDeliveryPoint
-    column delivery_point_type : String
-    column delivery_point_id : Int32
+    polymorphic delivery_point : UserStoreDeliveryPoint | UserAddressDeliveryPoint
+    # column delivery_point_type : String
+    # column delivery_point_id : Int32
+    
     column planned_delivery_date : Time? # Only date
     column delivered_at : Time?
     column total_cost : Float64
@@ -30,6 +33,10 @@ class UserOrder < BaseModel
   BONUS = 10 # percent
 
   def bonus_amount
-    (self.total_cost * BONUS / 100.0).to_i
+    self.class.bonus_amount(self.total_cost)
+  end
+
+  def self.bonus_amount(total_cost)
+    (total_cost * BONUS / 100.0).to_i
   end
 end
