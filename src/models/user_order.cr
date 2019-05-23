@@ -6,7 +6,7 @@ class UserOrder < BaseModel
   table :user_orders do
     # TODO: has_many_polymorphic order_items : OrderItem, :order
 
-    belongs_to bonus_change : BonusChange
+    belongs_to bonus_change : BonusChange?
 
     polymorphic delivery_point : UserStoreDeliveryPoint | UserAddressDeliveryPoint
     # column delivery_point_type : String
@@ -37,6 +37,6 @@ class UserOrder < BaseModel
   end
 
   def self.bonus_amount(total_cost)
-    (total_cost * BONUS / 100.0).to_i
+    (total_cost * BONUS / 100.0).to_i16
   end
 end

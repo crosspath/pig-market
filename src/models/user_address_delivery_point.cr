@@ -2,7 +2,7 @@ require "./user.cr"
 require "./address.cr"
 
 class UserAddressDeliveryPoint < BaseModel
-  table :user_store_delivery_points do
+  table :user_address_delivery_points do
     # TODO: has_many_polymorphic user_orders : UserOrder, :delivery_point
     
     belongs_to user : User

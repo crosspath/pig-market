@@ -46,7 +46,7 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
     create Store::TABLE_NAME do
       add type : Int16, default: 0 # Enum: [0: shop, 1: storehouse|depot]
       add name : String
-      add_belongs_to address : Address
+      add_belongs_to address : Address, on_delete: :restrict
       add address_notes : String, default: ""
     end
 
@@ -83,7 +83,7 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       # Enum: [0: 08:00-12:00, 1: 10:00-18:00, 2: 18:00-22:00]
       add planned_delivery_time_interval : Int16?, index: true
       add used_bonuses : Int32, default: 0
-      add_belongs_to bonus_change : BonusChange
+      add_belongs_to bonus_change : BonusChange?, on_delete: :nullify
     end
 
     create OrderItem::TABLE_NAME do
@@ -99,14 +99,14 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
     end
 
     create UserStoreDeliveryPoint::TABLE_NAME do
-      add_belongs_to user : User
-      add_belongs_to store : Store
+      add_belongs_to user : User, on_delete: :cascade
+      add_belongs_to store : Store, on_delete: :cascade
       add hidden : Bool, default: false
     end
 
     create UserAddressDeliveryPoint::TABLE_NAME do
-      add_belongs_to user : User
-      add_belongs_to address : Address
+      add_belongs_to user : User, on_delete: :cascade
+      add_belongs_to address : Address, on_delete: :cascade
       add address_notes : String, default: ""
       add hidden : Bool, default: false
     end

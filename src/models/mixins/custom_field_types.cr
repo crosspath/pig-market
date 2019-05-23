@@ -110,8 +110,8 @@ class Avram::Model
     {% var = name_and_type.var %}
     {% type = name_and_type.type %}
     {% nilable = type.types.includes?(Nil) %}
-    column {{ var }}_type : String
-    column {{ var }}_id : Int32
+    column {{ var }}_type : String{% if nilable %}?{% end %}
+    column {{ var }}_id : Int32{% if nilable %}?{% end %}
     
     # Based on avram/src/avram/associations.cr, define_belongs_to_private_assoc_getter
     private def get_{{ var }}(allow_lazy : Bool = false) : {{ type }}
