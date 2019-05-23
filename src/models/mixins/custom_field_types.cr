@@ -100,7 +100,7 @@ end
 class Avram::Model
   alias DefaultValueType =
       Avram::Migrator::ColumnDefaultHelpers::ColumnDefaultType |
-      Avram::Migrator::ColumnDefaultHelpers::ColumnDefaultType2
+      Avram::Migrator::ColumnDefaultHelpers::ColumnDefaultType2 | Nil
 
   macro inherited
     DEFAULT_VALUES = Hash(Symbol, DefaultValueType).new

@@ -82,7 +82,7 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add total_weight : Float
       # Enum: [0: 08:00-12:00, 1: 10:00-18:00, 2: 18:00-22:00]
       add planned_delivery_time_interval : Int16?, index: true
-      add used_bonuses : Int32, default: 0
+      add used_bonuses : Int16, default: 0
       add_belongs_to bonus_change : BonusChange?, on_delete: :nullify
     end
 

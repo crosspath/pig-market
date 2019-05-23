@@ -12,7 +12,7 @@ class User < BaseModel
     column bonuses : Int32
     column role : Int16
 
-    default({:first_name => "", :last_name => "", :full_name => "", :bonuses => 0, :role => 0})
+    default({:first_name => "", :last_name => "", :full_name => "", :birth_date => nil, :bonuses => 0, :role => 0})
   end
   
   enum UserRole : Int16

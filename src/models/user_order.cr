@@ -17,9 +17,9 @@ class UserOrder < BaseModel
     column total_cost : Float64
     column total_weight : Float64
     column planned_delivery_time_interval : Int16?
-    column used_bonuses : Int32
+    column used_bonuses : Int16
     
-    default({:used_bonuses => 0})
+    default({:used_bonuses => 0.to_i16})
   end
   
   enum DeliveryTime : Int16
