@@ -33,7 +33,7 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add last_name : String, default: ""
       add full_name : String, default: ""
       add birth_date : Date?
-      add bonuses : Int32, default: 0
+      add bonuses : Int16, default: 0
       add role : Int16, default: 0 # Enum: [0: customer, 1: worker]
     end
 
