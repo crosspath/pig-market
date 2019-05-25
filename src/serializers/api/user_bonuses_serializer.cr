@@ -2,7 +2,7 @@ class Api::UserBonusesSerializer < Lucky::Serializer
   def initialize(
     @amount : Int16,
     @bc_earned : Array(BonusChange),
-    @bc_used : Tuple(Int32, Int16, Time)
+    @bc_used : Array(Tuple(Int32, Int16, Time))
   ); end
 
   def render

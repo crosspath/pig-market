@@ -14,7 +14,7 @@ class Api::Users::Bonuses < ApiAction
     else
       join = Avram::Join::Right.new(BonusChange::TABLE_NAME, UserOrder::TABLE_NAME)
       bc_query = BonusChangeQuery.new.join(join).created_at.asc_order
-      uo_query = UserOrderQuery.new.used_bonuses.gt(0).created_at.asc_order
+      uo_query = UserOrderQuery.new.used_bonuses.gt(0.to_i16).created_at.asc_order
 
       w.each do |tuple|
         bc_query.where(tuple[0], tuple[1])
@@ -30,7 +30,7 @@ class Api::Users::Bonuses < ApiAction
 
     result = Api::UserBonusesSerializer.new(amount, bc_earned, bc_used)
 
-    response_success(result)
+    response_success(bonuses: result)
   rescue e
     response_error(500, e)
   end
@@ -41,7 +41,7 @@ class Api::Users::Bonuses < ApiAction
     ids : Array(Int32)
   )
     unless ids.empty?
-      list << {"(delivery_point_type = '#{class_name}' and delivery_point_id in (?" + (ids.size - 1) * ",?" + "))", ids}
+      list << {"(delivery_point_type = '#{class_name}' and delivery_point_id in (?" + ",?" * (ids.size - 1) + "))", ids}
     end
   end
 end
