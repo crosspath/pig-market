@@ -7,6 +7,7 @@ class UserStoreDeliveryPoint < BaseModel
     
     belongs_to user : User
     belongs_to store : Store
+    belongs_to address : Address, :store # through
 
     column hidden : Bool
     
