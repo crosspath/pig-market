@@ -1,6 +1,8 @@
 class Api::GoodsInStoresSerializer < Lucky::Serializer
+  alias InStoresValue = GoodsInStore | Good | Store | Nil
+
   def initialize(
-    @records : Array(Tuple(GoodsInStore, Good?, Store?))
+    @records : Array(Hash(String, InStoresValue))
   ); end
 
   def render

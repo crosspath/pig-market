@@ -1,5 +1,5 @@
 class Api::UnitSerializer < Lucky::Serializer
-  alias ResultValue = Int32 | String | Api::GoodsSerializer
+  alias ResultValue = Int32 | String | Lucky::Serializer
 
   def initialize(
     @unit : Unit,
@@ -8,12 +8,12 @@ class Api::UnitSerializer < Lucky::Serializer
 
   def render
     res = Hash(Symbol, ResultValue){
-      id: @unit.id,
-      name: @unit.name
+      :id => @unit.id,
+      :name => @unit.name
     }
 
     if @goods
-      res[:goods] = Api::GoodsSerializer.new(@goods)
+      res[:goods] = Api::GoodsSerializer.new(@goods.not_nil!)
     end
 
     res

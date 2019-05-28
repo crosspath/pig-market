@@ -1,21 +1,22 @@
 class Api::GoodsInStoreSerializer < Lucky::Serializer
-  alias ResultValue = Int16 | Api::GoodSerializer | Api::StoreSerializer
+  alias InStoresValue = GoodsInStore | Good | Store | Nil
+  alias ResultValue = Int16 | Nil | Lucky::Serializer
 
   def initialize(
-    @record : Tuple(GoodsInStore, Good?, Store?)
+    @record : Hash(String, InStoresValue)
   ); end
 
   def render
     res = Hash(Symbol, ResultValue){
-      amount: @record[0].amount
+      :amount => @record["gs"]?.as(GoodsInStore?).try(&.amount)
     }
 
-    if @record[1]
-      res[:good] = Api::GoodSerializer.new(@record[1])
+    if @record["g"]
+      res[:good] = Api::GoodSerializer.new(@record["g"].as(Good?).not_nil!)
     end
 
-    if @record[2]
-      res[:store] = Api::StoreSerializer.new(@record[2])
+    if @record["s"]
+      res[:store] = Api::StoreSerializer.new(@record["s"].as(Store?).not_nil!)
     end
 
     res

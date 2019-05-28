@@ -10,13 +10,12 @@ class Api::Users::UserOrders < ApiAction
     if w.empty?
       orders = [] of UserOrder
     else
+      where_clause = w.map(&.first).join(" OR ")
+      where_values = w.flat_map(&.last)
+
       orders_query = UserOrderQuery.new.created_at.asc_order
 
-      w.each do |tuple|
-        orders_query.where(tuple[0], tuple[1])
-      end
-
-      orders = orders_query.results
+      orders = orders_query.where_in(where_clause, where_values).results
     end
 
     result = Api::UserOrdersSerializer.new(orders)

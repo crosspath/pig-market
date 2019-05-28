@@ -1,6 +1,5 @@
 class Api::OrderItemSerializer < Lucky::Serializer
-  alias ResultValue = Int16 | Int32 | Float | Api::GoodSerializer | Api::StoreSerializer
-    | Api::StoreOrderSerializer | Api::UserOrderSerializer
+  alias ResultValue = Int16 | Int32 | Float64 | Lucky::Serializer
 
   def initialize(
     @item : OrderItem,
@@ -11,25 +10,25 @@ class Api::OrderItemSerializer < Lucky::Serializer
 
   def render
     res = Hash(Symbol, ResultValue){
-      id: @item.id,
-      price: @item.price,
-      amount: @item.amount,
-      weight_of_packaged_items: @item.weight_of_packaged_items
+      :id => @item.id,
+      :price => @item.price,
+      :amount => @item.amount,
+      :weight_of_packaged_items => @item.weight_of_packaged_items
     }
 
     if @good
-      res[:good] = Api::GoodSerializer.new(@good)
+      res[:good] = Api::GoodSerializer.new(@good.not_nil!)
     end
 
     if @store
-      res[:store] = Api::StoreSerializer.new(@store)
+      res[:store] = Api::StoreSerializer.new(@store.not_nil!)
     end
 
     case @order
     when StoreOrder
-      res[:store_order] = Api::StoreOrderSerializer.new(@order)
-    when UserStoreDeliveryPoint
-      res[:user_order] = Api::UserOrderSerializer.new(@order)
+      res[:store_order] = Api::StoreOrderSerializer.new(@order.as(StoreOrder))
+    when UserOrder
+      res[:user_order] = Api::UserOrderSerializer.new(@order.as(UserOrder))
     end
 
     res

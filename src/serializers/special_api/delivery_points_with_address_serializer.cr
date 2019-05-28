@@ -1,7 +1,8 @@
 class SpecialApi::DeliveryPointsWithAddressSerializer < Lucky::Serializer
   def initialize(
     @address_dp : Array(UserAddressDeliveryPoint) | UserAddressDeliveryPointQuery,
-    @store_dp : Array(UserStoreDeliveryPoint) | UserStoreDeliveryPointQuery
+    @store_dp : Array(UserStoreDeliveryPoint) | UserStoreDeliveryPointQuery,
+    @addresses : Hash(Int32, Array(Address))
   ); end
 
   def render
@@ -9,8 +10,9 @@ class SpecialApi::DeliveryPointsWithAddressSerializer < Lucky::Serializer
       Api::UserAddressDeliveryPointSerializer.new(u, u.address)
     end
 
-    res = @store_dp.map do |u|
-      Api::UserStoreDeliveryPointSerializer.new(u, u.store, u.store.try(&.address))
+    res += @store_dp.map do |u|
+      address = @addresses[u.store.try(&.address_id)]?.try(&.first)
+      Api::UserStoreDeliveryPointSerializer.new(u, u.store, address)
     end
 
     res

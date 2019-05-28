@@ -230,7 +230,7 @@ class Db::CreateSampleSeeds < LuckyCli::Task
       )
 
       if DataGenerator.shot?
-        ub, bs, am = 0, 0, 0
+        ub, bs, am = 0.to_i16, 0.to_i16, 0.to_i16
       else
         ub = DataGenerator.true? ? [user.bonuses, DataGenerator.count].max : 0
         ub = [ub, user.bonuses, total_cost].min.to_i16

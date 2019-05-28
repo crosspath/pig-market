@@ -21,7 +21,7 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add weight : Float
     end
 
-    $w[price weight].each do |field|
+    %w[price weight].each do |field|
       add_check_gteq(Good::TABLE_NAME, field)
     end
 
@@ -41,7 +41,7 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add role : Int16, default: 0 # Enum: [0: customer, 1: worker]
     end
 
-    $w[bonuses role].each do |field|
+    %w[bonuses role].each do |field|
       add_check_gteq(User::TABLE_NAME, field)
     end
 
@@ -77,7 +77,7 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add total_weight : Float
     end
 
-    $w[total_cost total_weight].each do |field|
+    %w[total_cost total_weight].each do |field|
       add_check_gteq(StoreOrder::TABLE_NAME, field)
     end
 
@@ -98,13 +98,13 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add earned_bonuses_state : Int16, default: 0
     end
 
-    t = [UserStoreDeliveryPoint, UserAddressDeliveryPoint].map(&.name.inspect).join(", ")
+    t = [UserStoreDeliveryPoint, UserAddressDeliveryPoint].map { |x| "'#{x.name}'" }.join(", ")
     execute "ALTER TABLE #{UserOrder::TABLE_NAME} ADD CHECK (delivery_point_type IN (#{t}))"
 
     field = "planned_delivery_time_interval"
     execute "ALTER TABLE #{UserOrder::TABLE_NAME} ADD CHECK (#{field} IS NULL OR #{field} >= 0)"
 
-    $w[total_cost total_weight used_bonuses earned_bonuses earned_bonuses_state].each do |field|
+    %w[total_cost total_weight used_bonuses earned_bonuses earned_bonuses_state].each do |field|
       add_check_gteq(UserOrder::TABLE_NAME, field)
     end
 
@@ -120,7 +120,10 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add amount : Int16, default: 1
     end
 
-    $w[price weight_of_packaged_items].each do |field|
+    t = [StoreOrder, UserOrder].map { |x| "'#{x.name}'" }.join(", ")
+    execute "ALTER TABLE #{OrderItem::TABLE_NAME} ADD CHECK (order_type IN (#{t}))"
+
+    %w[price weight_of_packaged_items].each do |field|
       add_check_gteq(OrderItem::TABLE_NAME, field)
     end
 

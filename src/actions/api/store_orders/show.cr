@@ -1,7 +1,7 @@
 class Api::StoreOrders::Show < ApiAction
   route do
-    order = StoreOrderQuery.new.preload_user.preload_store.find(order_id)
-    items = OrderItemQuery.new.order_type(StoreOrder.name).order_id(order.id).results
+    order = StoreOrderQuery.new.preload_user.preload_store.find(store_order_id)
+    items = OrderItemQuery.new.order_type(StoreOrder.name).order_id(store_order_id).results
 
     result = Api::StoreOrderSerializer.new(order, order.user, order.store, items)
 

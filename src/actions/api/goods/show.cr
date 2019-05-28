@@ -9,11 +9,27 @@ class Api::Goods::Show < ApiAction
     stores = StoreQuery.new.id.in(store_ids).group_by(&.id)
 
     in_stores = good.goods_in_stores.map do |gs|
-      {gs, nil, stores[gs.store_id]?.try(&.first)}
+      {"gs" => gs, "g" => nil, "s" => stores[gs.store_id]?.try(&.first)}
     end
 
-    result = Api::GoodSerializer.new(
-      good, good.unit, good.categories, in_stores, good.order_items
+    orders_groups   = good.order_items.group_by(&.order_type)
+    store_order_ids = orders_groups[StoreOrder.name]?.try(&.map(&.order_id).to_a)
+    user_order_ids  = orders_groups[UserOrder.name]?.try(&.map(&.order_id).to_a)
+
+    store_orders = if store_order_ids.nil? || store_order_ids.empty?
+      [] of StoreOrder
+    else
+      StoreOrderQuery.new.id.in(store_order_ids).results
+    end
+
+    user_orders = if user_order_ids.nil? || user_order_ids.empty?
+      [] of UserOrder
+    else
+      UserOrderQuery.new.id.in(user_order_ids).results
+    end
+
+    result = SpecialApi::GoodWithOrdersSerializer.new(
+      good, good.unit, good.categories, in_stores, store_orders, user_orders
     )
 
     response_success(good: result)

@@ -1,6 +1,5 @@
 class UserOrderForm < UserOrder::BaseForm
-  fillable bonus_change_id,
-      delivery_point_type,
+  fillable delivery_point_type,
       delivery_point_id,
       planned_delivery_date,
       delivered_at,

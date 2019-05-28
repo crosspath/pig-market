@@ -1,7 +1,7 @@
 class Api::AddressSerializer < Lucky::Serializer
   alias DeliveryPoints = UserAddressDeliveryPointQuery | Array(UserAddressDeliveryPoint)
-  alias ResultValue = Int32 | String | Api::StoresSerializer
-    | Array(Api::UserAddressDeliveryPointSerializer)
+  alias ResultValue = Int32 | String | Lucky::Serializer |
+      Array(Api::UserAddressDeliveryPointSerializer)
 
   def initialize(
     @address : Address,
@@ -11,18 +11,18 @@ class Api::AddressSerializer < Lucky::Serializer
 
   def render
     attributes = Hash(Symbol, ResultValue){
-      id: @address.id,
-      city: @address.city,
-      street: @address.street,
-      building: @address.building
+      :id => @address.id,
+      :city => @address.city,
+      :street => @address.street,
+      :building => @address.building
     }
 
     if @stores
-      attributes[:stores] = Api::StoresSerializer.new(@stores)
+      attributes[:stores] = Api::StoresSerializer.new(@stores.not_nil!)
     end
 
     if @delivery_points
-      attributes[:delivery_points] = @delivery_points.map do |u|
+      attributes[:delivery_points] = @delivery_points.not_nil!.map do |u|
         Api::UserAddressDeliveryPointSerializer.new(u)
       end
     end

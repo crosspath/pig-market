@@ -1,4 +1,4 @@
-class Api::GoodSerializer < Lucky::Serializer
+class SpecialApi::GoodWithOrdersSerializer < Lucky::Serializer
   alias InStoresValue = GoodsInStore | Good | Store | Nil
   alias ResultValue = Int32 | String | Float64 | Lucky::Serializer | Array(Lucky::Serializer)
 
@@ -7,7 +7,8 @@ class Api::GoodSerializer < Lucky::Serializer
     @unit : Unit | Nil = nil,
     @categories : CategoryQuery | Array(Category) | Nil = nil,
     @in_stores : Array(Hash(String, InStoresValue)) | Nil = nil,
-    @order_items : OrderItemQuery | Array(OrderItem) | Nil = nil
+    @store_orders : StoreOrderQuery | Array(StoreOrder) | Nil = nil,
+    @user_orders : UserOrderQuery | Array(UserOrder) | Nil = nil
   ); end
 
   def render
@@ -31,8 +32,12 @@ class Api::GoodSerializer < Lucky::Serializer
       res[:in_stores] = Api::GoodsInStoresSerializer.new(@in_stores.not_nil!)
     end
 
-    if @order_items
-      res[:order_items] = Api::OrderItemsSerializer.new(@order_items.not_nil!)
+    if @store_orders
+      res[:store_orders] = Api::StoreOrdersSerializer.new(@store_orders.not_nil!)
+    end
+
+    if @user_orders
+      res[:user_orders] = Api::UserOrdersSerializer.new(@user_orders.not_nil!)
     end
 
     res
