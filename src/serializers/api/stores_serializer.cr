@@ -3,11 +3,7 @@ class Api::StoresSerializer < Lucky::Serializer
 
   def render
     @stores.map do |u|
-      {
-        id: u.id,
-        name: u.name,
-        type: u.type
-      }
+      Api::StoreSerializer.new(u)
     end
   end
 end

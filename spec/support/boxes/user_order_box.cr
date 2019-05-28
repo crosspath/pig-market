@@ -8,6 +8,7 @@ class UserOrderBox < Avram::Box
     total_weight 0.0
     planned_delivery_time_interval 0
     used_bonuses 0
-    bonus_change_id 0
+    earned_bonuses 0
+    earned_bonuses_state 0
   end
 end

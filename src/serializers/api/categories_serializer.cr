@@ -3,12 +3,7 @@ class Api::CategoriesSerializer < Lucky::Serializer
 
   def render
     @categories.map do |u|
-      {
-        id: u.id,
-        name: u.name,
-        path: u.path,
-        description: u.description
-      }
+      Api::CategorySerializer.new(u)
     end
   end
 end

@@ -11,7 +11,7 @@ class Api::UserSerializer < Lucky::Serializer
       birth_date: @user.birth_date,
       bonuses:    @user.bonuses,
       role:       @user.role,
-      role_name:  User::UserRole.new(@user.role)
+      role_name:  User::UserRole.from_value?(@user.role)
     }
   end
 end

@@ -21,6 +21,10 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add weight : Float
     end
 
+    $w[price weight].each do |field|
+      add_check_gteq(Good::TABLE_NAME, field)
+    end
+
     create GoodsCategory::TABLE_NAME do
       add_belongs_to good : Good, on_delete: :cascade
       add_belongs_to category : Category, on_delete: :cascade
@@ -37,6 +41,10 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add role : Int16, default: 0 # Enum: [0: customer, 1: worker]
     end
 
+    $w[bonuses role].each do |field|
+      add_check_gteq(User::TABLE_NAME, field)
+    end
+
     create Address::TABLE_NAME do
       add city : String, index: true
       add street : String, default: ""
@@ -50,19 +58,16 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add address_notes : String, default: ""
     end
 
+    add_check_gteq(Store::TABLE_NAME, "type")
+
     create GoodsInStore::TABLE_NAME do
       add_belongs_to good : Good, on_delete: :cascade
       add_belongs_to store : Store, on_delete: :cascade
       add amount : Int16, default: 1
     end
 
-    create BonusChange::TABLE_NAME do
-      # Activated bonus should be rejected and order_id should be nullified
-      # before deleting this order
-      add change : Int16 # N or -N, where N is a number
-      add state : Int16, default: 0 # Enum: [0: created, 1: activated, 2: rejected]
-    end
-    
+    add_check_gteq(GoodsInStore::TABLE_NAME, "amount", 1)
+
     create StoreOrder::TABLE_NAME do
       add_belongs_to user : User, on_delete: :restrict
       add_belongs_to store : Store, on_delete: :restrict
@@ -70,6 +75,10 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add delivered_at : Time?, index: true
       add total_cost : Float
       add total_weight : Float
+    end
+
+    $w[total_cost total_weight].each do |field|
+      add_check_gteq(StoreOrder::TABLE_NAME, field)
     end
 
     create UserOrder::TABLE_NAME do
@@ -83,7 +92,20 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       # Enum: [0: 08:00-12:00, 1: 10:00-18:00, 2: 18:00-22:00]
       add planned_delivery_time_interval : Int16?, index: true
       add used_bonuses : Int16, default: 0
-      add_belongs_to bonus_change : BonusChange?, on_delete: :nullify
+      # Activated bonus should be rejected before deleting this order
+      add earned_bonuses : Int16 # Should be >= 0
+      # Enum: [0: created, 1: activated, 2: rejected]
+      add earned_bonuses_state : Int16, default: 0
+    end
+
+    t = [UserStoreDeliveryPoint, UserAddressDeliveryPoint].map(&.name.inspect).join(", ")
+    execute "ALTER TABLE #{UserOrder::TABLE_NAME} ADD CHECK (delivery_point_type IN (#{t}))"
+
+    field = "planned_delivery_time_interval"
+    execute "ALTER TABLE #{UserOrder::TABLE_NAME} ADD CHECK (#{field} IS NULL OR #{field} >= 0)"
+
+    $w[total_cost total_weight used_bonuses earned_bonuses earned_bonuses_state].each do |field|
+      add_check_gteq(UserOrder::TABLE_NAME, field)
     end
 
     create OrderItem::TABLE_NAME do
@@ -97,6 +119,12 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add weight_of_packaged_items : Float
       add amount : Int16, default: 1
     end
+
+    $w[price weight_of_packaged_items].each do |field|
+      add_check_gteq(OrderItem::TABLE_NAME, field)
+    end
+
+    add_check_gteq(OrderItem::TABLE_NAME, "amount", 1)
 
     create UserStoreDeliveryPoint::TABLE_NAME do
       add_belongs_to user : User, on_delete: :cascade
@@ -119,7 +147,6 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       OrderItem::TABLE_NAME,
       UserOrder::TABLE_NAME,
       StoreOrder::TABLE_NAME,
-      BonusChange::TABLE_NAME,
       GoodsInStore::TABLE_NAME,
       Store::TABLE_NAME,
       Address::TABLE_NAME,
@@ -131,5 +158,9 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
     ].each do |table|
       drop table
     end
+  end
+
+  def add_check_gteq(table, field, value = 0)
+    execute "ALTER TABLE #{table} ADD CHECK (#{field} >= #{value})"
   end
 end

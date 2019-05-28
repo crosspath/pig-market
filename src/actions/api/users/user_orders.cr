@@ -4,8 +4,8 @@ class Api::Users::UserOrders < ApiAction
     store_dp = UserStoreDeliveryPointQuery.new.user_id(user_id).results.map(&.id).to_a
 
     w = [] of Tuple(String, Array(Int32))
-    add_sql_where_delivery_point(w, "UserAddressDeliveryPoint", address_dp)
-    add_sql_where_delivery_point(w, "UserStoreDeliveryPoint", store_dp)
+    add_sql_where_delivery_point(w, UserAddressDeliveryPoint.name, address_dp)
+    add_sql_where_delivery_point(w, UserStoreDeliveryPoint.name, store_dp)
 
     if w.empty?
       orders = [] of UserOrder
@@ -16,7 +16,7 @@ class Api::Users::UserOrders < ApiAction
         orders_query.where(tuple[0], tuple[1])
       end
 
-      orders = orders_query.preload_user_orders.results
+      orders = orders_query.results
     end
 
     result = Api::UserOrdersSerializer.new(orders)

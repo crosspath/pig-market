@@ -1,29 +1,31 @@
 class Api::UserAddressDeliveryPointSerializer < Lucky::Serializer
+  alias ResultValue = Int32 | String | Bool | Api::AddressSerializer | Api::UserSerializer
+      | Api::UserOrdersSerializer
+
   def initialize(
     @dp : UserAddressDeliveryPoint,
-    @with_orders : Bool = true,
-    @with_address : Bool = true
+    @address : Address | Nil = nil,
+    @user : User | Nil = nil,
+    @orders : Array(UserOrder) | UserOrderQuery | Nil = nil
   ); end
 
   def render
-    res = {
+    res = Hash(Symbol, ResultValue){
       id: u.id,
-      type: "UserAddressDeliveryPoint",
-      user_id: u.user_id,
       hidden: u.hidden,
       address_notes: u.address_notes
     }
-    if @with_address
-      address = @dp.address
-      res[:address] = address ? {
-        id: address.id,
-        city: address.city,
-        street: address.street,
-        building: address.building
-      } : nil
+
+    if @address
+      res[:address] = Api::AddressSerializer.new(@address)
     end
-    if @with_orders
-      raise "Not implemented" # TODO
+
+    if @user
+      res[:user] = Api::UserSerializer.new(@user)
+    end
+
+    if @orders
+      res[:user_orders] = Api::UserOrdersSerializer.new(@orders)
     end
 
     res

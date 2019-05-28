@@ -3,9 +3,7 @@ class Api::UserOrdersSerializer < Lucky::Serializer
 
   def render
     @orders.map do |u|
-      Api::UserOrderSerializer.new(
-        u, with_items: false, with_bonus: false, with_delivery_point: false
-      )
+      Api::UserOrderSerializer.new(u)
     end
   end
 end

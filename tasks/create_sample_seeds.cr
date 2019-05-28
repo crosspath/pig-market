@@ -199,36 +199,10 @@ class Db::CreateSampleSeeds < LuckyCli::Task
     {dp_type, dp_id}
   end
 
-  private def use_and_earn_bonuses(user_id, total_cost)
-    if DataGenerator.shot?
-      ub = 0.to_i16
-      bc_id = nil
-    else
-      user = UserQuery.find(user_id)
-      ub   = DataGenerator.true? ? [user.bonuses, DataGenerator.count].max : 0
-      ub   = [ub, user.bonuses, total_cost].min.to_i16
-      am   = UserOrder.bonus_amount(total_cost)
-
-      bc = BonusChangeBox.create do |q|
-        st = (DataGenerator.count % 3).to_i16
-
-        q.change(am).state(st)
-      end
-      bc_id = bc.id
-      
-      new_bonuses_amount = user.bonuses + (bc.state == 1 ? am : 0.to_i16) - ub
-      user_params = {"bonuses" => new_bonuses_amount.to_s}
-
-      UserForm.update(user, user_params) do |f, b|
-        raise "Not updated: UserForm, #{user_id}" unless b
-      end
-    end
-
-    {ub, bc_id}
-  end
-
   private def create_user_order(customer_ids, goods, user_d_points, store_ids, address_ids)
     user_id = customer_ids.sample
+    user = UserQuery.find(user_id)
+
     total_cost = goods.reduce(0.0) { |acc, el| acc + el.price }
     total_weight = goods.reduce(0.0) { |acc, el| acc + el.weight }
 
@@ -255,13 +229,32 @@ class Db::CreateSampleSeeds < LuckyCli::Task
         user_id, user_d_points, store_ids, address_ids
       )
 
-      ub, bc_id = use_and_earn_bonuses(user_id, total_cost)
+      if DataGenerator.shot?
+        ub, bs, am = 0, 0, 0
+      else
+        ub = DataGenerator.true? ? [user.bonuses, DataGenerator.count].max : 0
+        ub = [ub, user.bonuses, total_cost].min.to_i16
+        bs = (DataGenerator.count % 3).to_i16
+        am = UserOrder.bonus_amount(total_cost)
+      end
 
       a.delivery_point_type(dp_type).delivery_point_id(dp_id)
           .planned_delivery_date(planned_date).delivered_at(actual_ts)
           .total_cost(total_cost - ub).total_weight(total_weight)
           .planned_delivery_time_interval(planned_time)
-          .bonus_change_id(bc_id).used_bonuses(ub)
+          .used_bonuses(ub).earned_bonuses_state(bs).earned_bonuses(am)
+    end
+
+    if order.earned_bonuses_state == 1 || order.used_bonuses > 0
+      new_bonuses_amount = user.bonuses
+      new_bonuses_amount += order.earned_bonuses if order.earned_bonuses_state == 1
+      new_bonuses_amount -= order.used_bonuses
+
+      user_params = {"bonuses" => new_bonuses_amount.to_s}
+
+      UserForm.update(user, user_params) do |f, b|
+        raise "Not updated: UserForm, #{user_id}" unless b
+      end
     end
 
     order

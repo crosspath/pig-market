@@ -7,5 +7,7 @@ class UserOrderForm < UserOrder::BaseForm
       total_cost,
       total_weight,
       planned_delivery_time_interval,
-      used_bonuses
+      used_bonuses,
+      earned_bonuses,
+      earned_bonuses_state
 end

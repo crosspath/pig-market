@@ -3,10 +3,7 @@ class Api::UnitsSerializer < Lucky::Serializer
 
   def render
     @units.map do |u|
-      {
-        id: u.id,
-        name: u.name
-      }
+      Api::UnitSerializer.new(u)
     end
   end
 end
