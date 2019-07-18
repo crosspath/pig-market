@@ -1,6 +1,6 @@
-class UserForm < User::BaseForm
-  fillable login, first_name, last_name, full_name, birth_date, bonuses, role
-  virtual password : String
+class UserForm < User::SaveOperation
+  permit_columns login, first_name, last_name, full_name, birth_date, bonuses, role
+  attribute password : String
 
   def prepare
     if password.value

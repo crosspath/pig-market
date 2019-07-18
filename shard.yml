@@ -1,5 +1,5 @@
 name: pig_market
-version: 0.1.0
+version: 0.1.2
 
 authors:
   - Evgeniy Nochevnov <xpath@e1.ru>
@@ -8,12 +8,12 @@ targets:
   pig_market:
     main: src/pig_market.cr
 
-crystal: 0.28.0
+crystal: 0.29.0
 
 dependencies:
   lucky:
     github: luckyframework/lucky
-    version: ~> 0.14
+    branch: master
   authentic:
     github: luckyframework/authentic
     version: ~> 0.3

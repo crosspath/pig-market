@@ -12,39 +12,6 @@ struct Date
   end
 end
 
-struct Int16
-  module Lucky
-    alias ColumnType = Int16
-    include Avram::Type
-    include ::DB::Mappable
-
-    def self.from_db!(value : Int16)
-      value
-    end
-
-    def self.parse(value : String)
-      SuccessfulCast(Int16).new value.to_i16
-    rescue ArgumentError
-      FailedCast.new
-    end
-
-    def self.parse(value : Int16)
-      SuccessfulCast(Int16).new(value)
-    end
-
-    def self.to_db(value : Int16)
-      value.to_s
-    end
-
-    class Criteria(T, V) < Avram::Criteria(T, V)
-    end
-  end
-  
-  def blank?
-    nil?
-  end
-end
-
 module Avram::Migrator::ColumnDefaultHelpers
   alias ColumnDefaultType2 = Date | Int16
 
@@ -66,41 +33,14 @@ module Avram::Migrator::ColumnDefaultHelpers
 end
 
 module Avram::Migrator::ColumnTypeOptionHelpers
-  alias ColumnType2 = Date.class | Int16.class
-
   def column_type(type : Date.class)
     "date"
-  end
-
-  def column_type(type : Int16.class)
-    "smallint"
-  end
-end
-
-class Avram::Migrator::CreateTableStatement
-  def add_column(name, type : ColumnType2, optional = false, reference = nil, on_delete = :do_nothing, default : ColumnDefaultType? | ColumnDefaultType2? = nil, options : NamedTuple? = nil)
-    if options
-      column_type_with_options = column_type(type, **options)
-    else
-      column_type_with_options = column_type(type)
-    end
-
-    rows << String.build do |row|
-      row << "  "
-      row << name.to_s
-      row << " "
-      row << column_type_with_options
-      row << null_fragment(optional)
-      row << default_value(type, default) unless default.nil?
-      row << references(reference, on_delete)
-    end
   end
 end
 
 class Avram::Model
   alias DefaultValueType =
-      Avram::Migrator::ColumnDefaultHelpers::ColumnDefaultType |
-      Avram::Migrator::ColumnDefaultHelpers::ColumnDefaultType2 | Nil
+      Bool | Float64 | Int16 | Int32 | Int64 | JSON::Any | String | Time | UUID | Nil
 
   macro inherited
     DEFAULT_VALUES = Hash(Symbol, DefaultValueType).new
@@ -185,7 +125,6 @@ class Avram::Model
   end
 
   macro default(hash)
-    #{#% DEFAULT_VALUES.merge!(hash) %}
     {% for field, value in hash %}
       DEFAULT_VALUES[{{field}}] = {{value}}
     {% end %}

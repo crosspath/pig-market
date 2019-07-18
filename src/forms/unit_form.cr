@@ -1,3 +1,3 @@
-class UnitForm < Unit::BaseForm
-  fillable name
+class UnitForm < Unit::SaveOperation
+  permit_columns name
 end

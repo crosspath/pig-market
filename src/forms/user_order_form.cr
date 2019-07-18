@@ -1,5 +1,5 @@
-class UserOrderForm < UserOrder::BaseForm
-  fillable delivery_point_type,
+class UserOrderForm < UserOrder::SaveOperation
+  permit_columns delivery_point_type,
       delivery_point_id,
       planned_delivery_date,
       delivered_at,

@@ -1,3 +1,3 @@
-class AddressForm < Address::BaseForm
-  fillable city, street, building
+class AddressForm < Address::SaveOperation
+  permit_columns city, street, building
 end

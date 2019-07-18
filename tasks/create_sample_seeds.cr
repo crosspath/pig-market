@@ -319,7 +319,7 @@ class Db::CreateSampleSeeds < LuckyCli::Task
       hash[key] = [] of Tuple(String, Int32)
     end
 
-    Avram::Repo.transaction do
+    AppDatabase.transaction do
       puts "Creating categories"
       category_ids = create_categories
       

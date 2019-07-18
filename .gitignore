@@ -5,6 +5,8 @@
 /node_modules
 yarn-error.log
 server
+start_server
+
 *.dwarf
 *.local.cr
 .env

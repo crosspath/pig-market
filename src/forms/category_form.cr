@@ -1,3 +1,3 @@
-class CategoryForm < Category::BaseForm
-  fillable path, name, description
+class CategoryForm < Category::SaveOperation
+  permit_columns path, name, description
 end
