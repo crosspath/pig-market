@@ -1,6 +1,6 @@
-class Api::Users::DeliveryPoints < ApiAction
-  get "/api/users/:user_id/delivery_points" do
-    dp_results = DeliveryPointQuery.select_all(user_id.to_i)
+class Api::DeliveryPoints::Index < ApiAction
+  route do
+    dp_results = DeliveryPointQuery.select_all
 
     result = SpecialApi::DeliveryPointsWithAddressSerializer.new(
       dp_results[:address_dps],

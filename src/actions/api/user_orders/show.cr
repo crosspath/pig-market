@@ -3,19 +3,22 @@ class Api::UserOrders::Show < ApiAction
     order = UserOrderQuery.new.find(user_order_id)
     items = OrderItemQuery.new.order_type(UserOrder.name).order_id(user_order_id).results
 
-    # BUG: Crystal compiler infers type BaseModel | Nil for this `case`, not
-    # UserAddressDeliveryPoint | UserStoreDeliveryPoint | Nil
-    #
+    address_dp = nil
+    store_dp   = nil
+
     case order.delivery_point_type
     when UserAddressDeliveryPoint.name
-      delivery_point = UserAddressDeliveryPointQuery.find(order.delivery_point_id)
-      result = Api::UserOrderSerializer.new(order, delivery_point, items)
+      address_dp = UserAddressDeliveryPointQuery.find(order.delivery_point_id)
     when UserStoreDeliveryPoint.name
-      delivery_point = UserStoreDeliveryPointQuery.find(order.delivery_point_id)
-      result = Api::UserOrderSerializer.new(order, delivery_point, items)
+      store_dp = UserStoreDeliveryPointQuery.find(order.delivery_point_id)
+    end
+
+    # BUG: Crystal compiler infers type BaseModel | Nil here if we use (address_dp || store_dp)
+    #
+    result = if address_dp
+      Api::UserOrderSerializer.new(order, address_dp, items)
     else
-      delivery_point = nil
-      result = Api::UserOrderSerializer.new(order, delivery_point, items)
+      Api::UserOrderSerializer.new(order, store_dp, items)
     end
 
     response_success(order: result)

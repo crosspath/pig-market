@@ -156,6 +156,13 @@ Goods in selected store (replace `123` with a store id):
 
     http://localhost:3001/api/stores/123?api_key=any-string
 
+### Delivery Points
+
+`index.cr`  
+List delivery points:
+
+    http://localhost:3001/api/delivery_points?api_key=any-string
+
 ### Addresses
 
 `index.cr`  
