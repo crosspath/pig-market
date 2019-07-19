@@ -10,6 +10,6 @@ class UserStoreDeliveryPoint < BaseModel
 
     column hidden : Bool
     
-    default({:hidden => false})
+    default({hidden: false})
   end
 end

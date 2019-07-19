@@ -1,50 +1,6 @@
-struct Date
-  property time : Time
-
-  def initialize(@time : Time); end
-
-  def to_s(format : String = "%Y-%m-%d")
-    @time.to_utc.to_s(format)
-  end
-  
-  def blank?
-    nil?
-  end
-end
-
-module Avram::Migrator::ColumnDefaultHelpers
-  alias ColumnDefaultType2 = Date | Int16
-
-  def value_to_string(type : Date.class, value : Date)
-    "'#{value}'"
-  end
-
-  def value_to_string(type : Int16.class, value : Int16 | Int32)
-    "#{value}"
-  end
-
-  def default_value(type : Int16.class, default : Int16 | Int32)
-    " DEFAULT #{value_to_string(type, default)}"
-  end
-
-  def default_value(type : Date.class, default : Date)
-    " DEFAULT #{value_to_string(type, default.to_s)}"
-  end
-end
-
-module Avram::Migrator::ColumnTypeOptionHelpers
-  def column_type(type : Date.class)
-    "date"
-  end
-end
-
 class Avram::Model
   alias DefaultValueType =
       Bool | Float64 | Int16 | Int32 | Int64 | JSON::Any | String | Time | UUID | Nil
-
-  macro inherited
-    DEFAULT_VALUES = Hash(Symbol, DefaultValueType).new
-  end
 
   macro polymorphic(name_and_type)
     {% var = name_and_type.var %}
@@ -122,28 +78,5 @@ class Avram::Model
     end
 
     # end of macro polymorphic
-  end
-
-  macro default(hash)
-    {% for field, value in hash %}
-      DEFAULT_VALUES[{{field}}] = {{value}}
-    {% end %}
-  end
-
-  macro setup_db_mapping
-    DB.mapping({
-      {% for field in FIELDS %}
-        {{field[:name]}}: {
-          {% if field[:type] == Float64.id %}
-            type: PG::Numeric,
-            convertor: Float64Convertor,
-          {% else %}
-            type: {{field[:type]}}::Lucky::ColumnType,
-            default: DEFAULT_VALUES[:{{field[:name]}}].as({{field[:type]}}),
-          {% end %}
-          nilable: {{field[:nilable]}},
-        },
-      {% end %}
-    })
   end
 end

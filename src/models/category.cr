@@ -7,7 +7,7 @@ class Category < BaseModel
     column name : String
     column description : String
 
-    default({:path => "", :description => ""})
+    default({path: "", description: ""})
   end
 
   def child_path

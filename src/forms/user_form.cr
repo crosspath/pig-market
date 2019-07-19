@@ -2,7 +2,7 @@ class UserForm < User::SaveOperation
   permit_columns login, first_name, last_name, full_name, birth_date, bonuses, role
   attribute password : String
 
-  def prepare
+  before_save do
     if password.value
       crypto = Crypto::Bcrypt::Password.create(password.value.as(String), cost: 10)
       crypted_password.value = crypto.to_s

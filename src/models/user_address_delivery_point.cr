@@ -11,6 +11,6 @@ class UserAddressDeliveryPoint < BaseModel
     column address_notes : String
     column hidden : Bool
     
-    default({:address_notes => "", :hidden => false})
+    default({address_notes: "", hidden: false})
   end
 end

@@ -15,6 +15,6 @@ class Good < BaseModel
     column price : Float64
     column weight : Float64
 
-    default({:description => ""})
+    default({description: ""})
   end
 end

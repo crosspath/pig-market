@@ -7,6 +7,6 @@ class Address < BaseModel
     column street : String
     column building : String
 
-    default({:street => "", :building => ""})
+    default({street: "", building: ""})
   end
 end

@@ -18,7 +18,7 @@ class UserOrder < BaseModel
     column earned_bonuses : Int16
     column earned_bonuses_state : Int16
     
-    default({:used_bonuses => 0.to_i16, :earned_bonuses_state => 0.to_i16})
+    default({used_bonuses: 0.to_i16, earned_bonuses_state: 0.to_i16})
   end
   
   enum DeliveryTime : Int16

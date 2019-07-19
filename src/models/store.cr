@@ -14,7 +14,7 @@ class Store < BaseModel
     column name : String
     column address_notes : String
 
-    default({:type => 0}) # Shop
+    default({type: 0.to_i16}) # Shop
   end
   
   enum StoreType : Int16

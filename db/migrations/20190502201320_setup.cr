@@ -1,21 +1,31 @@
 class Setup::V20190502201320 < Avram::Migrator::Migration::V1
   def migrate
-    # `create` always includes columns for `id` & timestamps
     # NOTE: models have column with type Float64 while migration declares Float.
+    #
+    # BUG in Avram: declaration of Primary Key here is a declaration of a column +AND+
+    # a sequence, but it should be separate commands or more explicit, like:
+    #     primary_key id : PG::Serial
+    # Because for has_one associations id column +HAS+ integer type, but +HAS NOT+ a sequence.
 
     create Category::TABLE_NAME do
+      primary_key id : Int32
+      add_timestamps
       add path : String, index: true, default: "" # Materialised Path
       add name : String
       add description : String, default: ""
     end
 
     create Unit::TABLE_NAME do
+      primary_key id : Int32
+      add_timestamps
       add name : String
     end
 
     create Good::TABLE_NAME do
+      primary_key id : Int32
+      add_timestamps
       add name : String
-      add_belongs_to unit : Unit?, on_delete: :nullify
+      add_belongs_to unit : Unit?, on_delete: :nullify, foreign_key_type: Int32
       add description : String, default: ""
       add price : Float
       add weight : Float
@@ -26,11 +36,15 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
     end
 
     create GoodsCategory::TABLE_NAME do
-      add_belongs_to good : Good, on_delete: :cascade
-      add_belongs_to category : Category, on_delete: :cascade
+      primary_key id : Int32
+      add_timestamps
+      add_belongs_to good : Good, on_delete: :cascade, foreign_key_type: Int32
+      add_belongs_to category : Category, on_delete: :cascade, foreign_key_type: Int32
     end
 
     create User::TABLE_NAME do
+      primary_key id : Int32
+      add_timestamps
       add login : String, unique: true
       add crypted_password : String
       add first_name : String, default: ""
@@ -46,31 +60,39 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
     end
 
     create Address::TABLE_NAME do
+      primary_key id : Int32
+      add_timestamps
       add city : String, index: true
       add street : String, default: ""
       add building : String, default: ""
     end
 
     create Store::TABLE_NAME do
+      primary_key id : Int32
+      add_timestamps
       add type : Int16, default: 0 # Enum: [0: shop, 1: storehouse|depot]
       add name : String
-      add_belongs_to address : Address, on_delete: :restrict
+      add_belongs_to address : Address, on_delete: :restrict, foreign_key_type: Int32
       add address_notes : String, default: ""
     end
 
     add_check_gteq(Store::TABLE_NAME, "type")
 
     create GoodsInStore::TABLE_NAME do
-      add_belongs_to good : Good, on_delete: :cascade
-      add_belongs_to store : Store, on_delete: :cascade
+      primary_key id : Int32
+      add_timestamps
+      add_belongs_to good : Good, on_delete: :cascade, foreign_key_type: Int32
+      add_belongs_to store : Store, on_delete: :cascade, foreign_key_type: Int32
       add amount : Int16, default: 1
     end
 
     add_check_gteq(GoodsInStore::TABLE_NAME, "amount", 1)
 
     create StoreOrder::TABLE_NAME do
-      add_belongs_to user : User, on_delete: :restrict
-      add_belongs_to store : Store, on_delete: :restrict
+      primary_key id : Int32
+      add_timestamps
+      add_belongs_to user : User, on_delete: :restrict, foreign_key_type: Int32
+      add_belongs_to store : Store, on_delete: :restrict, foreign_key_type: Int32
       add planned_delivery_date : Date?, index: true
       add delivered_at : Time?, index: true
       add total_cost : Float
@@ -82,6 +104,8 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
     end
 
     create UserOrder::TABLE_NAME do
+      primary_key id : Int32
+      add_timestamps
       # Polymorphic: UserStoreDeliveryPoint, UserAddressDeliveryPoint
       add delivery_point_type : String
       add delivery_point_id : Int32
@@ -109,12 +133,14 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
     end
 
     create OrderItem::TABLE_NAME do
+      primary_key id : Int32
+      add_timestamps
       # Before deleting an order all its items should be removed
       # Polymorphic: StoreOrder, UserOrder
       add order_type : String
       add order_id : Int32
-      add_belongs_to store : Store?, on_delete: :nullify
-      add_belongs_to good : Good?, on_delete: :nullify
+      add_belongs_to store : Store?, on_delete: :nullify, foreign_key_type: Int32
+      add_belongs_to good : Good?, on_delete: :nullify, foreign_key_type: Int32
       add price : Float
       add weight_of_packaged_items : Float
       add amount : Int16, default: 1
@@ -130,14 +156,18 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
     add_check_gteq(OrderItem::TABLE_NAME, "amount", 1)
 
     create UserStoreDeliveryPoint::TABLE_NAME do
-      add_belongs_to user : User, on_delete: :cascade
-      add_belongs_to store : Store, on_delete: :cascade
+      primary_key id : Int32
+      add_timestamps
+      add_belongs_to user : User, on_delete: :cascade, foreign_key_type: Int32
+      add_belongs_to store : Store, on_delete: :cascade, foreign_key_type: Int32
       add hidden : Bool, default: false
     end
 
     create UserAddressDeliveryPoint::TABLE_NAME do
-      add_belongs_to user : User, on_delete: :cascade
-      add_belongs_to address : Address, on_delete: :cascade
+      primary_key id : Int32
+      add_timestamps
+      add_belongs_to user : User, on_delete: :cascade, foreign_key_type: Int32
+      add_belongs_to address : Address, on_delete: :cascade, foreign_key_type: Int32
       add address_notes : String, default: ""
       add hidden : Bool, default: false
     end

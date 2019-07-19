@@ -16,6 +16,6 @@ class OrderItem < BaseModel
     column weight_of_packaged_items : Float64
     column amount : Int16
 
-    default({:amount => 1})
+    default({amount: 1.to_i16})
   end
 end
