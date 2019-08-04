@@ -8,7 +8,7 @@ targets:
   pig_market:
     main: src/pig_market.cr
 
-crystal: 0.29.0
+crystal: 0.30.0
 
 dependencies:
   lucky:
