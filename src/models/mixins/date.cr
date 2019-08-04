@@ -12,7 +12,7 @@ struct Date
   end
 end
 
-class Avram::Migrator::Columns::DateColumn < Avram::Migrator::Columns::Base
+class Avram::Migrator::Columns::DateColumn(T) < Avram::Migrator::Columns::Base
   @default : Date | Nil = nil
 
   def initialize(@name, @nilable, @default)

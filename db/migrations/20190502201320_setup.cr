@@ -1,7 +1,5 @@
 class Setup::V20190502201320 < Avram::Migrator::Migration::V1
   def migrate
-    # NOTE: models have column with type Float64 while migration declares Float.
-    #
     # BUG in Avram: declaration of Primary Key here is a declaration of a column +AND+
     # a sequence, but it should be separate commands or more explicit, like:
     #     primary_key id : PG::Serial
@@ -27,8 +25,8 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add name : String
       add_belongs_to unit : Unit?, on_delete: :nullify, foreign_key_type: Int32
       add description : String, default: ""
-      add price : Float
-      add weight : Float
+      add price : Float64
+      add weight : Float64
     end
 
     %w[price weight].each do |field|
@@ -95,8 +93,8 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add_belongs_to store : Store, on_delete: :restrict, foreign_key_type: Int32
       add planned_delivery_date : Date?, index: true
       add delivered_at : Time?, index: true
-      add total_cost : Float
-      add total_weight : Float
+      add total_cost : Float64
+      add total_weight : Float64
     end
 
     %w[total_cost total_weight].each do |field|
@@ -111,8 +109,8 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add delivery_point_id : Int32
       add planned_delivery_date : Date?, index: true
       add delivered_at : Time?, index: true
-      add total_cost : Float
-      add total_weight : Float
+      add total_cost : Float64
+      add total_weight : Float64
       # Enum: [0: 08:00-12:00, 1: 10:00-18:00, 2: 18:00-22:00]
       add planned_delivery_time_interval : Int16?, index: true
       add used_bonuses : Int16, default: 0
@@ -141,8 +139,8 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add order_id : Int32
       add_belongs_to store : Store?, on_delete: :nullify, foreign_key_type: Int32
       add_belongs_to good : Good?, on_delete: :nullify, foreign_key_type: Int32
-      add price : Float
-      add weight_of_packaged_items : Float
+      add price : Float64
+      add weight_of_packaged_items : Float64
       add amount : Int16, default: 1
     end
 
