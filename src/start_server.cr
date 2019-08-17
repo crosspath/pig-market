@@ -1,5 +1,4 @@
 require "./app"
-require "./app_server"
 
 if Lucky::Env.development?
   Avram::Migrator::Runner.new.ensure_migrated!
@@ -13,4 +12,3 @@ Signal::INT.trap do
 end
 
 app_server.listen
-

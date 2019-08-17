@@ -1,10 +1,12 @@
-module Shared::FieldErrors
+module Shared::FieldErrors(T) < BaseComponent
+  needs field : Avram::PermittedAttribute(T)
+
   # Customize the markup and styles to match your application
-  def errors_for(field : Avram::FillableField)
-    unless field.valid?
+  def render
+    unless @field.valid?
       div class: "error" do
-        label_text = Wordsmith::Inflector.humanize(field.name.to_s)
-        text "#{label_text} #{field.errors.join(", ")}"
+        label_text = Wordsmith::Inflector.humanize(@field.name.to_s)
+        text "#{label_text} #{@field.errors.first}"
       end
     end
   end

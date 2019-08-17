@@ -1,6 +1,7 @@
 class AppServer < Lucky::BaseAppServer
   def middleware
     [
+      # Lucky::ForceSSLHandler.new,
       Lucky::HttpMethodOverrideHandler.new,
       Lucky::LogHandler.new,
       Lucky::SessionHandler.new,
@@ -11,12 +12,13 @@ class AppServer < Lucky::BaseAppServer
       Lucky::RouteNotFoundHandler.new,
     ]
   end
-  
+
   def protocol
     "http"
   end
-  
+
   def listen
+    # Learn about bind_tcp: https://tinyurl.com/bind-tcp-docs
     server.bind_tcp(host, port, reuse_port: false)
     server.listen
   end
