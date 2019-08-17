@@ -1,4 +1,4 @@
-module Shared::FieldErrors(T) < BaseComponent
+class Shared::FieldErrors(T) < BaseComponent
   needs field : Avram::PermittedAttribute(T)
 
   # Customize the markup and styles to match your application

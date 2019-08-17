@@ -31,7 +31,8 @@ class Api::Users::UserOrders < ApiAction
     ids : Array(Int32)
   )
     unless ids.empty?
-      list << {"(delivery_point_type = '#{class_name}' and delivery_point_id in (?" + ",?" * (ids.size - 1) + "))", ids}
+      q = "?" + ",?" * (ids.size - 1)
+      list << {"(delivery_point_type = '#{class_name}' and delivery_point_id in (" + q + "))", ids}
     end
   end
 end

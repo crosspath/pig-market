@@ -1,9 +1,11 @@
 class Api::Stores::Show < ApiAction
   route do
-    store_query = StoreQuery.new
-    store_query = store_query.preload_address.preload_order_items
-    store_query = store_query.preload_user_store_delivery_points.preload_goods_in_stores
-    store_query = store_query.preload_store_orders
+    store_query = StoreQuery.new.
+        preload_address.
+        preload_order_items.
+        preload_user_store_delivery_points.
+        preload_goods_in_stores.
+        preload_store_orders
 
     store = store_query.find(store_id)
 
