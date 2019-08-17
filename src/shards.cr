@@ -1,6 +1,6 @@
 # Load .env file before any other config or app code
 require "dotenv"
-Dotenv.load
+Dotenv.load unless ENV.fetch("LUCKY_ENV", "") == "production"
 
 # Require your shards here
 require "avram"
