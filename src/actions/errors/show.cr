@@ -1,4 +1,12 @@
 class Errors::Show < Lucky::ErrorAction
+  def default_render(error : Exception) : Lucky::Response
+    error.message
+  end
+
+  def report(error : Exception) : Nil
+    puts "! Error: #{error.message}"
+  end
+
   def handle_error(error : JSON::ParseException)
     message = "There was a problem parsing the JSON." +
               " Please check that it is formed correctly"
