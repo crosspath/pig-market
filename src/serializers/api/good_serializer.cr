@@ -1,6 +1,5 @@
-class Api::GoodSerializer < Lucky::Serializer
+class Api::GoodSerializer < BaseSerializer
   alias InStoresValue = GoodsInStore | Good | Store | Nil
-  alias ResultValue = Int32 | String | Float64 | Lucky::Serializer | Array(Lucky::Serializer)
 
   def initialize(
     @good : Good,
@@ -24,15 +23,18 @@ class Api::GoodSerializer < Lucky::Serializer
     end
 
     if @categories
-      res[:categories] = Api::CategoriesSerializer.new(@categories.not_nil!)
+      items = Api::CategorySerializer.for_collection(@categories.not_nil!)
+      res[:categories] = items
     end
 
     if @in_stores
-      res[:in_stores] = Api::GoodsInStoresSerializer.new(@in_stores.not_nil!)
+      items = Api::GoodsInStoreSerializer.for_collection(@in_stores.not_nil!)
+      res[:in_stores] = items
     end
 
     if @order_items
-      res[:order_items] = Api::OrderItemsSerializer.new(@order_items.not_nil!)
+      items = Api::OrderItemSerializer.for_collection(@order_items.not_nil!)
+      res[:order_items] = items
     end
 
     res

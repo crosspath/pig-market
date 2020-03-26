@@ -2,7 +2,7 @@ class Api::Goods::Index < ApiAction
   route do
     goods = GoodQuery.new.name.asc_order
 
-    result = Api::GoodsSerializer.new(goods)
+    result = Api::GoodSerializer.for_collection(goods)
 
     response_success(goods: result)
   rescue e

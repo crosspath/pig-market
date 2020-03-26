@@ -1,5 +1,8 @@
-abstract class ApiAction < Lucky::Action
-  # Include modules and add methods that are for all API requests
+require "./base_api_action"
+
+# Include modules and add methods that are for all API requests
+abstract class ApiAction < BaseApiAction
+  include Api::Auth::SkipRequireAuthToken
 
   before check_api_key
 

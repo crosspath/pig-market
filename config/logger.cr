@@ -3,7 +3,7 @@ require "file_utils"
 logger =
   if Lucky::Env.test?
     # Logs to `tmp/test.log` so you can see what's happening without having
-    # a bunch of log output in your specs results.
+    # a bunch of log output in your spec results.
     FileUtils.mkdir_p("tmp")
     Dexter::Logger.new(
       io: File.new("tmp/test.log", mode: "w"),
@@ -31,6 +31,16 @@ logger =
 
 Lucky.configure do |settings|
   settings.logger = logger
+end
+
+Lucky::LogHandler.configure do |settings|
+  # Skip logging static assets in development
+  if Lucky::Env.development?
+    settings.skip_if = ->(context : HTTP::Server::Context) {
+      context.request.method.downcase == "get" &&
+      context.request.resource.starts_with?(/\/css\/|\/js\/|\/assets\/|\/favicon\.ico/)
+    }
+  end
 end
 
 Avram.configure do |settings|

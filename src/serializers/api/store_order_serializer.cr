@@ -1,6 +1,4 @@
-class Api::StoreOrderSerializer < Lucky::Serializer
-  alias ResultValue = Int32 | String | Float64 | Nil | Lucky::Serializer
-
+class Api::StoreOrderSerializer < BaseSerializer
   def initialize(
     @order : StoreOrder,
     @user : User | Nil = nil,
@@ -26,7 +24,8 @@ class Api::StoreOrderSerializer < Lucky::Serializer
     end
 
     if @items
-      res[:order_items] = Api::OrderItemsSerializer.new(@items.not_nil!)
+      items = Api::OrderItemSerializer.for_collection(@items.not_nil!)
+      res[:order_items] = items
     end
 
     res

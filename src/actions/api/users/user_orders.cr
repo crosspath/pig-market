@@ -18,7 +18,7 @@ class Api::Users::UserOrders < ApiAction
       orders = orders_query.where_in(where_clause, where_values).results
     end
 
-    result = Api::UserOrdersSerializer.new(orders)
+    result = Api::UserOrderSerializer.for_collection(orders)
 
     response_success(user_orders: result)
   rescue e

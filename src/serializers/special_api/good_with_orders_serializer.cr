@@ -25,19 +25,23 @@ class SpecialApi::GoodWithOrdersSerializer < Lucky::Serializer
     end
 
     if @categories
-      res[:categories] = Api::CategoriesSerializer.new(@categories.not_nil!)
+      items = Api::CategorySerializer.for_collection(@categories.not_nil!)
+      res[:categories] = items
     end
 
     if @in_stores
-      res[:in_stores] = Api::GoodsInStoresSerializer.new(@in_stores.not_nil!)
+      items = Api::GoodsInStoreSerializer.for_collection(@in_stores.not_nil!)
+      res[:in_stores] = items
     end
 
     if @store_orders
-      res[:store_orders] = Api::StoreOrdersSerializer.new(@store_orders.not_nil!)
+      items = Api::StoreOrderSerializer.for_collection(@store_orders.not_nil!)
+      res[:store_orders] = items
     end
 
     if @user_orders
-      res[:user_orders] = Api::UserOrdersSerializer.new(@user_orders.not_nil!)
+      items = Api::UserOrderSerializer.for_collection(@user_orders.not_nil!)
+      res[:user_orders] = items
     end
 
     res

@@ -1,6 +1,4 @@
-class Api::OrderItemSerializer < Lucky::Serializer
-  alias ResultValue = Int16 | Int32 | Float64 | Lucky::Serializer
-
+class Api::OrderItemSerializer < BaseSerializer
   def initialize(
     @item : OrderItem,
     @good : Good | Nil = nil,

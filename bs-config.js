@@ -3,6 +3,7 @@
  |
  | For up-to-date information about the options:
  |   http://www.browsersync.io/docs/options/
+ |
  */
 
 module.exports = {

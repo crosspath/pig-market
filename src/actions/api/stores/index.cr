@@ -2,7 +2,7 @@ class Api::Stores::Index < ApiAction
   route do
     stores = StoreQuery.new.name.asc_order
 
-    result = Api::StoresSerializer.new(stores)
+    result = Api::StoreSerializer.for_collection(stores)
 
     response_success(stores: result)
   rescue e

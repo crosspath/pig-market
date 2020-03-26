@@ -1,6 +1,4 @@
-class Api::UnitSerializer < Lucky::Serializer
-  alias ResultValue = Int32 | String | Lucky::Serializer
-
+class Api::UnitSerializer < BaseSerializer
   def initialize(
     @unit : Unit,
     @goods : GoodQuery | Array(Good) | Nil = nil
@@ -13,7 +11,8 @@ class Api::UnitSerializer < Lucky::Serializer
     }
 
     if @goods
-      res[:goods] = Api::GoodsSerializer.new(@goods.not_nil!)
+      items = Api::GoodSerializer.for_collection(@goods.not_nil!)
+      res[:goods] = items
     end
 
     res

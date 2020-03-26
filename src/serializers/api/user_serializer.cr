@@ -1,4 +1,4 @@
-class Api::UserSerializer < Lucky::Serializer
+class Api::UserSerializer < BaseSerializer
   def initialize(@user : User); end
 
   def render

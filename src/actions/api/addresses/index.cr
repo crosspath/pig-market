@@ -2,7 +2,7 @@ class Api::Addresses::Index < ApiAction
   route do
     addresses = AddressQuery.new.city.asc_order
 
-    result = Api::AddressesSerializer.new(addresses)
+    result = Api::AddressSerializer.for_collection(addresses)
 
     response_success(addresses: result)
   rescue e

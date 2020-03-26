@@ -2,7 +2,7 @@ class Api::Users::Index < ApiAction
   route do
     users = UserQuery.new.login.asc_order
 
-    result = Api::UsersSerializer.new(users)
+    result = Api::UserSerializer.for_collection(users)
 
     response_success(users: result)
   rescue e

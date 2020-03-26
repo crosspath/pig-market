@@ -1,5 +1,5 @@
 class AppServer < Lucky::BaseAppServer
-  def middleware
+  def middleware : Array(HTTP::Handler)
     [
       # Lucky::ForceSSLHandler.new,
       Lucky::HttpMethodOverrideHandler.new,
@@ -11,7 +11,7 @@ class AppServer < Lucky::BaseAppServer
       Lucky::RouteHandler.new,
       Lucky::StaticFileHandler.new("./public", false),
       Lucky::RouteNotFoundHandler.new,
-    ]
+    ] of HTTP::Handler
   end
 
   def protocol

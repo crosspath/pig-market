@@ -1,6 +1,5 @@
-class Api::GoodsInStoreSerializer < Lucky::Serializer
+class Api::GoodsInStoreSerializer < BaseSerializer
   alias InStoresValue = GoodsInStore | Good | Store | Nil
-  alias ResultValue = Int16 | Nil | Lucky::Serializer
 
   def initialize(
     @record : Hash(String, InStoresValue)

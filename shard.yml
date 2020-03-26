@@ -1,5 +1,5 @@
 name: pig_market
-version: 0.1.2
+version: 0.1.3
 
 authors:
   - Evgeniy Nochevnov <xpath@e1.ru>
@@ -17,7 +17,9 @@ dependencies:
     github: luckyframework/authentic
   carbon:
     github: luckyframework/carbon
-  lucky_flow:
-    github: luckyframework/lucky_flow
   dotenv:
     github: gdotdesign/cr-dotenv
+  lucky_flow:
+    github: luckyframework/lucky_flow
+  jwt:
+    github: crystal-community/jwt

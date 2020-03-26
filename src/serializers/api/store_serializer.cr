@@ -1,7 +1,5 @@
-class Api::StoreSerializer < Lucky::Serializer
+class Api::StoreSerializer < BaseSerializer
   alias InStoresValue = GoodsInStore | Good | Store | Nil
-  alias ResultValue = Int16 | Int32 | String | Nil | Lucky::Serializer |
-    Array(Api::UserStoreDeliveryPointSerializer)
 
   def initialize(
     @store : Store,
@@ -24,22 +22,25 @@ class Api::StoreSerializer < Lucky::Serializer
     if @address
       res[:address] = Api::AddressSerializer.new(@address.not_nil!)
     end
-    
+
     if @in_stores
-      res[:in_stores] = Api::GoodsInStoresSerializer.new(@in_stores.not_nil!)
+      items = Api::GoodsInStoreSerializer.for_collection(@in_stores.not_nil!)
+      res[:in_stores] = items
     end
 
     if @order_items
-      res[:order_items] = Api::OrderItemsSerializer.new(@order_items.not_nil!)
+      items = Api::OrderItemSerializer.for_collection(@order_items.not_nil!)
+      res[:order_items] = items
     end
 
     if @store_orders
-      res[:store_orders] = Api::StoreOrdersSerializer.new(@store_orders.not_nil!)
+      items = Api::StoreOrderSerializer.for_collection(@store_orders.not_nil!)
+      res[:store_orders] = items
     end
 
     if @delivery_points
       res[:user_store_delivery_points] = @delivery_points.not_nil!.map do |u|
-        Api::UserStoreDeliveryPointSerializer.new(u)
+        Api::UserStoreDeliveryPointSerializer.new(u).as(Lucky::Serializer)
       end
     end
 

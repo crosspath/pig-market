@@ -1,6 +1,5 @@
-class Api::CategorySerializer < Lucky::Serializer
+class Api::CategorySerializer < BaseSerializer
   alias ManyRecords = CategoryQuery | Array(Category)
-  alias ResultValue = Int32 | String | Lucky::Serializer
 
   def initialize(
     @category : Category,
@@ -18,15 +17,18 @@ class Api::CategorySerializer < Lucky::Serializer
     }
 
     if @goods
-      res[:goods] = Api::GoodsSerializer.new(@goods.not_nil!)
+      items = Api::GoodSerializer.for_collection(@goods.not_nil!)
+      res[:goods] = items
     end
 
     if @nested
-      res[:nested] = Api::CategoriesSerializer.new(@nested.not_nil!)
+      items = Api::CategorySerializer.for_collection(@nested.not_nil!)
+      res[:nested] = items
     end
 
     if @parents
-      res[:parents] = Api::CategoriesSerializer.new(@parents.not_nil!)
+      items = Api::CategorySerializer.for_collection(@parents.not_nil!)
+      res[:parents] = items
     end
 
     res

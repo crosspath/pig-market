@@ -1,4 +1,6 @@
 class User < BaseModel
+  include Authentic::PasswordAuthenticatable
+
   table :users do
     has_many user_store_delivery_points : UserStoreDeliveryPoint
     has_many user_address_delivery_points : UserAddressDeliveryPoint
@@ -21,9 +23,13 @@ class User < BaseModel
              role:       0.to_i16
     })
   end
-  
+
   enum UserRole : Int16
     Customer
     Worker
+  end
+
+  def encrypted_password : String | Nil
+    crypted_password
   end
 end

@@ -2,7 +2,7 @@ class Api::Units::Index < ApiAction
   route do
     units = UnitQuery.new.name.asc_order
 
-    result = Api::UnitsSerializer.new(units)
+    result = Api::UnitSerializer.for_collection(units)
 
     response_success(units: result)
   rescue e

@@ -1,7 +1,5 @@
-class Api::AddressSerializer < Lucky::Serializer
+class Api::AddressSerializer < BaseSerializer
   alias DeliveryPoints = UserAddressDeliveryPointQuery | Array(UserAddressDeliveryPoint)
-  alias ResultValue = Int32 | String | Lucky::Serializer |
-      Array(Api::UserAddressDeliveryPointSerializer)
 
   def initialize(
     @address : Address,
@@ -18,12 +16,13 @@ class Api::AddressSerializer < Lucky::Serializer
     }
 
     if @stores
-      attributes[:stores] = Api::StoresSerializer.new(@stores.not_nil!)
+      items = Api::StoreSerializer.for_collection(@stores.not_nil!)
+      attributes[:stores] = items
     end
 
     if @delivery_points
       attributes[:delivery_points] = @delivery_points.not_nil!.map do |u|
-        Api::UserAddressDeliveryPointSerializer.new(u)
+        Api::UserAddressDeliveryPointSerializer.new(u).as(Lucky::Serializer)
       end
     end
 

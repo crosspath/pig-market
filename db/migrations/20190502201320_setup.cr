@@ -1,10 +1,5 @@
 class Setup::V20190502201320 < Avram::Migrator::Migration::V1
   def migrate
-    # BUG in Avram: declaration of Primary Key here is a declaration of a column +AND+
-    # a sequence, but it should be separate commands or more explicit, like:
-    #     primary_key id : PG::Serial
-    # Because for has_one associations id column +HAS+ integer type, but +HAS NOT+ a sequence.
-
     create Category::TABLE_NAME do
       primary_key id : Int32
       add_timestamps
