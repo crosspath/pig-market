@@ -90,7 +90,7 @@ class Db::CreateSampleSeeds < LuckyCli::Task
       # Cannot use UserBox, because `password` is a virtual field in UserForm,
       # that is not available in User::BaseForm (used by UserBox < Avram::Box).
       # Also, instantiating UserForm in UserBox crashes Crystal:
-      # 
+      #
       # Invalid memory access (signal 11) at address 0x0
       # [0x5645407f4f16] *CallStack::print_backtrace:Int32 +118
       # [0x5645407c0360] __crystal_sigfault_handler +192
@@ -222,7 +222,7 @@ class Db::CreateSampleSeeds < LuckyCli::Task
       planned_time = planned_date ? DataGenerator.count.to_i16 : nil
       planned_time = nil if planned_time && planned_time > 2
 
-      total_cost += DataGenerator.count.to_f - 2.0
+      total_cost += (DataGenerator.count.to_f - 2.0).abs
       total_weight += DataGenerator.count.to_f
 
       dp_type, dp_id = find_or_create_delivery_point(
@@ -322,7 +322,7 @@ class Db::CreateSampleSeeds < LuckyCli::Task
     AppDatabase.transaction do
       puts "Creating categories"
       category_ids = create_categories
-      
+
       if category_ids.empty?
         puts "Unexpected behaviour: no categories created"
         break

@@ -6,7 +6,7 @@ struct Date
   def to_s(format : String = "%Y-%m-%d")
     @time.to_utc.to_s(format)
   end
-  
+
   def blank?
     nil?
   end
@@ -18,7 +18,7 @@ class Avram::Migrator::Columns::DateColumn(T) < Avram::Migrator::Columns::Base
   def initialize(@name, @nilable, @default)
   end
 
-  def column_type
+  def column_type : String
     "date"
   end
 

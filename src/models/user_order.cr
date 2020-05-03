@@ -8,7 +8,7 @@ class UserOrder < BaseModel
     polymorphic delivery_point : UserStoreDeliveryPoint | UserAddressDeliveryPoint
     # column delivery_point_type : String
     # column delivery_point_id : Int32
-    
+
     column planned_delivery_date : Time? # Only date
     column delivered_at : Time?
     column total_cost : Float64
@@ -17,10 +17,10 @@ class UserOrder < BaseModel
     column used_bonuses : Int16
     column earned_bonuses : Int16
     column earned_bonuses_state : Int16
-    
+
     default({used_bonuses: 0.to_i16, earned_bonuses_state: 0.to_i16})
   end
-  
+
   enum DeliveryTime : Int16
     Morning
     Day
@@ -32,7 +32,7 @@ class UserOrder < BaseModel
     Activated
     Rejected
   end
-  
+
   DELIVERY_TIME_TEXT = ["08:00-12:00", "10:00-18:00", "18:00-22:00"]
 
   BONUS = 10 # percent

@@ -36,6 +36,8 @@ class Api::UserOrderSerializer < BaseSerializer
     when UserStoreDeliveryPoint
       dp = @delivery_point.as(UserStoreDeliveryPoint)
       res[:user_store_delivery_point] = StorePointSerializer.new(dp)
+    else
+      nil
     end
 
     if @items

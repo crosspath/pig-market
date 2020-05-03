@@ -11,6 +11,8 @@ class Api::UserOrders::Show < ApiAction
       address_dp = UserAddressDeliveryPointQuery.find(order.delivery_point_id)
     when UserStoreDeliveryPoint.name
       store_dp = UserStoreDeliveryPointQuery.find(order.delivery_point_id)
+    else
+      nil
     end
 
     # BUG: Crystal compiler infers type BaseModel | Nil here if we use (address_dp || store_dp)

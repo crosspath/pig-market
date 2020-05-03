@@ -9,9 +9,9 @@ Test project for learning Crystal / PostgreSQL / JavaScript.
 Tested on Ubuntu/Kubuntu 18.10.
 
 1. Install from OS repositories: PostgreSQL, `libyaml-dev`, `nodejs` (or `node.js`; tested on v8 & v12)
-2. Install [Crystal](https://crystal-lang.org/reference/installation/), [Lucky Framework](http://luckyframework.org/guides/installing.html), [Yarn](https://yarnpkg.com/en/docs/install)
+2. Install [Crystal](https://crystal-lang.org/install/), [Lucky Framework](https://luckyframework.org/guides/getting-started/installing), [Yarn](https://yarnpkg.com/en/docs/install)
 3. Install [Forego](https://dl.equinox.io/ddollar/forego/stable), or [Foreman](https://github.com/ddollar/foreman), or [Overmind](https://github.com/DarthSim/overmind), or [Hivemind](https://github.com/DarthSim/hivemind)
-4. Create database in PostgreSQL. Run `sudo -u postgres psql` to open PostgreSQL console. Recommendation: run these SQL queries in PostgreSQL console  
+4. Create database in PostgreSÂQL. Run `sudo -u postgres psql` to open PostgreSQL console. Recommendation: run these SQL queries in PostgreSQL console  
 ```
 CREATE USER pig_user PASSWORD '12345678';
 CREATE DATABASE pig_db OWNER pig_user;
@@ -26,27 +26,23 @@ CREATE DATABASE pig_db OWNER pig_user;
 
 ### If you're using MacOS
 
-Tested on MacOS Mojave.
+Tested on MacOS Catalina (10.15.4).
 
-1. Install [Homebrew](https://brew.sh/), [Crystal](https://crystal-lang.org/reference/installation/), [PostgreSQL](https://www.postgresql.org/download/), [Lucky Framework](http://luckyframework.org/guides/installing.html), [Node.js](https://nodejs.org/en/download/package-manager/) (tested on v12), [Yarn](https://yarnpkg.com/en/docs/install)
+1. Install [Homebrew](https://brew.sh/), [Crystal](https://crystal-lang.org/install/), [PostgreSQL](https://www.postgresql.org/download/), [Lucky Framework](https://luckyframework.org/guides/getting-started/installing), [Node.js](https://nodejs.org/en/download/package-manager/) (tested on v13), [Yarn](https://yarnpkg.com/en/docs/install)
 2. Install [Forego](https://dl.equinox.io/ddollar/forego/stable), or [Foreman](https://github.com/ddollar/foreman), or [Overmind](https://github.com/DarthSim/overmind), or [Hivemind](https://github.com/DarthSim/hivemind). Recommendation: `brew install forego`.
 3. Run PostgreSQL server service, see [answers in StackOverflow](https://stackoverflow.com/questions/7975556/how-to-start-postgresql-server-on-mac-os-x#answers)
-4. Add this line to your `~/.bash_profile` file:  
-```
-export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/opt/openssl/lib/
-```
-5. Create database in PostgreSQL. Recommendation: run these SQL queries in PostgreSQL console  
+4. Create database in PostgreSQL. Recommendation: run these SQL queries in PostgreSQL console  
 ```
 CREATE USER pig_user PASSWORD '12345678';
 CREATE DATABASE pig_db OWNER pig_user;
 ```
-6. Run `git clone` for this repo and go to the cloned repo in `Terminal` (type `cd`, space and path to the cloned repo on your computer). All next commands should be run in the cloned repo.
-7. Copy `.env.template` to `.env` in the cloned repo and replace here `DATABASE_URL` and `API_KEY`. Parameter `DATABASE_URL` should include connection settings for user name, user password & database in PostgreSQL. Parameter `API_KEY` may have any string value. Recommendation: `nano .env.template`, replace `DATABASE_URL` and `API_KEY`, press `Ctrl+O` (`O` as letter), delete `.template`, press `Enter/Return` and then press `Ctrl+X`.
-8. Run `shards install && yarn install` to download required libraries
-9. Run `echo {} > public/mix-manifest.json`
-10. Run `lucky db.migrate` to create tables in the database
-11. Run `lucky db.create_sample_seeds` to generate sample rows
-12. Run `lucky dev` to start the app
+5. Run `git clone` for this repo and go to the cloned repo in `Terminal` (type `cd`, space and path to the cloned repo on your computer). All next commands should be run in the cloned repo.
+6. Copy `.env.template` to `.env` in the cloned repo and replace here `DATABASE_URL` and `API_KEY`. Parameter `DATABASE_URL` should include connection settings for user name, user password & database in PostgreSQL. Parameter `API_KEY` may have any string value. Recommendation: `nano .env.template`, replace `DATABASE_URL` and `API_KEY`, press `Ctrl+O` (`O` as letter), delete `.template`, press `Enter/Return` and then press `Ctrl+X`.
+7. Run `shards install && yarn install` to download required libraries
+8. Run `echo {} > public/mix-manifest.json`
+9. Run `lucky db.migrate` to create tables in the database
+10. Run `lucky db.create_sample_seeds` to generate sample rows
+11. Run `lucky dev` to start the app
 
 ## Usage
 
@@ -174,4 +170,3 @@ List addresses:
 Address info (replace `123` with an address id):
 
     http://localhost:3001/api/addresses/123?api_key=any-string
-

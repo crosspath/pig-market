@@ -27,6 +27,8 @@ class Api::OrderItemSerializer < BaseSerializer
       res[:store_order] = Api::StoreOrderSerializer.new(@order.as(StoreOrder))
     when UserOrder
       res[:user_order] = Api::UserOrderSerializer.new(@order.as(UserOrder))
+    else
+      nil
     end
 
     res
