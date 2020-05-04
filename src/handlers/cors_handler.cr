@@ -1,11 +1,11 @@
 class CORSHandler
   include HTTP::Handler
 
-  def call(context)
+  def call(context : HTTP::Server::Context)
     context.response.headers["Access-Control-Allow-Origin"] = "*"
     context.response.headers["Access-Control-Allow-Headers"] = "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range"
     context.response.headers["Access-Control-Allow-Methods"] = "*"
-    
+
     # If this is an OPTIONS call, respond with just the needed headers.
     if context.request.method == "OPTIONS"
       context.response.status = HTTP::Status::NO_CONTENT

@@ -7,10 +7,16 @@ Lucky::Server.configure do |settings|
     settings.secret_key_base = secret_key_from_env
     settings.host = "0.0.0.0"
     settings.port = ENV["PORT"].to_i
+    settings.gzip_enabled = true
+    # By default certain content types will be gzipped.
+    # For a full list look in
+    # https://github.com/luckyframework/lucky/blob/master/src/lucky/server.cr
+    # To add additional extensions do something like this:
+    # config.gzip_content_types << "content/type"
   else
-    settings.secret_key_base = "s+KdLNeU1R5rcdLWQkwMP8vRd42wCpb8AFKOwHOh7Bs="
+    settings.secret_key_base = "l0iuOb/WrBVgUERHCySbmnv0aHG/hZyyxqRvsLSJkGs="
     # Change host/port in config/watch.yml
-    # Alternatively, you can set the PORT env to set the port
+    # Alternatively, you can set the DEV_PORT env to set the port for local development
     settings.host = Lucky::ServerSettings.host
     settings.port = Lucky::ServerSettings.port
   end

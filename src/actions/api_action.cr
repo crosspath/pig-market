@@ -1,8 +1,6 @@
-require "./base_api_action"
-
 # Include modules and add methods that are for all API requests
-abstract class ApiAction < BaseApiAction
-  include Api::Auth::SkipRequireAuthToken
+abstract class ApiAction < Lucky::Action
+  accepted_formats [:json]
 
   before check_api_key
 
