@@ -2,7 +2,7 @@ require "./user_address_delivery_point.cr"
 require "./user_store_delivery_point.cr"
 
 class UserOrder < BaseModel
-  table :user_orders do
+  table do
     # TODO: has_many_polymorphic order_items : OrderItem, :order
 
     polymorphic delivery_point : UserStoreDeliveryPoint | UserAddressDeliveryPoint
@@ -17,8 +17,11 @@ class UserOrder < BaseModel
     column used_bonuses : Int16
     column earned_bonuses : Int16
     column earned_bonuses_state : Int16
+  end
 
-    default({used_bonuses: 0.to_i16, earned_bonuses_state: 0.to_i16})
+  macro add_default_columns
+    column used_bonuses : Int16
+    column earned_bonuses_state : Int16
   end
 
   enum DeliveryTime : Int16

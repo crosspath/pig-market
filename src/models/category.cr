@@ -1,13 +1,16 @@
 class Category < BaseModel
-  table :categories do
+  table do
     has_many goods_categories : GoodsCategory
     has_many goods : Good, :goods_categories # has_many through
 
     column path : String
     column name : String
     column description : String
+  end
 
-    default({path: "", description: ""})
+  macro add_default_columns
+    column path : String
+    column description : String
   end
 
   def child_path

@@ -1,7 +1,5 @@
 class User < BaseModel
-  include Authentic::PasswordAuthenticatable
-
-  table :users do
+  table do
     has_many user_store_delivery_points : UserStoreDeliveryPoint
     has_many user_address_delivery_points : UserAddressDeliveryPoint
 
@@ -13,15 +11,15 @@ class User < BaseModel
     column birth_date : Time? # Only date
     column bonuses : Int16
     column role : Int16
+  end
 
-    default({
-             first_name: "",
-             last_name:  "",
-             full_name:  "",
-             birth_date: nil,
-             bonuses:    0.to_i16,
-             role:       0.to_i16
-    })
+  macro add_default_columns
+    column first_name : String
+    column last_name : String
+    column full_name : String
+    column birth_date : Time?
+    column bonuses : Int16
+    column role : Int16
   end
 
   enum UserRole : Int16

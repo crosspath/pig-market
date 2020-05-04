@@ -1,6 +1,6 @@
 class Setup::V20190502201320 < Avram::Migrator::Migration::V1
   def migrate
-    create Category::TABLE_NAME do
+    create table_for(Category) do
       primary_key id : Int32
       add_timestamps
       add path : String, index: true, default: "" # Materialised Path
@@ -8,13 +8,13 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add description : String, default: ""
     end
 
-    create Unit::TABLE_NAME do
+    create table_for(Unit) do
       primary_key id : Int32
       add_timestamps
       add name : String
     end
 
-    create Good::TABLE_NAME do
+    create table_for(Good) do
       primary_key id : Int32
       add_timestamps
       add name : String
@@ -25,17 +25,17 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
     end
 
     %w[price weight].each do |field|
-      add_check_gteq(Good::TABLE_NAME, field)
+      add_check_gteq(table_for(Good), field)
     end
 
-    create GoodsCategory::TABLE_NAME do
+    create table_for(GoodsCategory) do
       primary_key id : Int32
       add_timestamps
       add_belongs_to good : Good, on_delete: :cascade, foreign_key_type: Int32
       add_belongs_to category : Category, on_delete: :cascade, foreign_key_type: Int32
     end
 
-    create User::TABLE_NAME do
+    create table_for(User) do
       primary_key id : Int32
       add_timestamps
       add login : String, unique: true
@@ -49,10 +49,10 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
     end
 
     %w[bonuses role].each do |field|
-      add_check_gteq(User::TABLE_NAME, field)
+      add_check_gteq(table_for(User), field)
     end
 
-    create Address::TABLE_NAME do
+    create table_for(Address) do
       primary_key id : Int32
       add_timestamps
       add city : String, index: true
@@ -60,7 +60,7 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add building : String, default: ""
     end
 
-    create Store::TABLE_NAME do
+    create table_for(Store) do
       primary_key id : Int32
       add_timestamps
       add type : Int16, default: 0 # Enum: [0: shop, 1: storehouse|depot]
@@ -69,9 +69,9 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add address_notes : String, default: ""
     end
 
-    add_check_gteq(Store::TABLE_NAME, "type")
+    add_check_gteq(table_for(Store), "type")
 
-    create GoodsInStore::TABLE_NAME do
+    create table_for(GoodsInStore) do
       primary_key id : Int32
       add_timestamps
       add_belongs_to good : Good, on_delete: :cascade, foreign_key_type: Int32
@@ -79,9 +79,9 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add amount : Int16, default: 1
     end
 
-    add_check_gteq(GoodsInStore::TABLE_NAME, "amount", 1)
+    add_check_gteq(table_for(GoodsInStore), "amount", 1)
 
-    create StoreOrder::TABLE_NAME do
+    create table_for(StoreOrder) do
       primary_key id : Int32
       add_timestamps
       add_belongs_to user : User, on_delete: :restrict, foreign_key_type: Int32
@@ -93,10 +93,10 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
     end
 
     %w[total_cost total_weight].each do |field|
-      add_check_gteq(StoreOrder::TABLE_NAME, field)
+      add_check_gteq(table_for(StoreOrder), field)
     end
 
-    create UserOrder::TABLE_NAME do
+    create table_for(UserOrder) do
       primary_key id : Int32
       add_timestamps
       # Polymorphic: UserStoreDeliveryPoint, UserAddressDeliveryPoint
@@ -116,16 +116,16 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
     end
 
     t = [UserStoreDeliveryPoint, UserAddressDeliveryPoint].map { |x| "'#{x.name}'" }.join(", ")
-    execute "ALTER TABLE #{UserOrder::TABLE_NAME} ADD CHECK (delivery_point_type IN (#{t}))"
+    execute "ALTER TABLE #{table_for(UserOrder)} ADD CHECK (delivery_point_type IN (#{t}))"
 
     field = "planned_delivery_time_interval"
-    execute "ALTER TABLE #{UserOrder::TABLE_NAME} ADD CHECK (#{field} IS NULL OR #{field} >= 0)"
+    execute "ALTER TABLE #{table_for(UserOrder)} ADD CHECK (#{field} IS NULL OR #{field} >= 0)"
 
     %w[total_cost total_weight used_bonuses earned_bonuses earned_bonuses_state].each do |field|
-      add_check_gteq(UserOrder::TABLE_NAME, field)
+      add_check_gteq(table_for(UserOrder), field)
     end
 
-    create OrderItem::TABLE_NAME do
+    create table_for(OrderItem) do
       primary_key id : Int32
       add_timestamps
       # Before deleting an order all its items should be removed
@@ -140,15 +140,15 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
     end
 
     t = [StoreOrder, UserOrder].map { |x| "'#{x.name}'" }.join(", ")
-    execute "ALTER TABLE #{OrderItem::TABLE_NAME} ADD CHECK (order_type IN (#{t}))"
+    execute "ALTER TABLE #{table_for(OrderItem)} ADD CHECK (order_type IN (#{t}))"
 
     %w[price weight_of_packaged_items].each do |field|
-      add_check_gteq(OrderItem::TABLE_NAME, field)
+      add_check_gteq(table_for(OrderItem), field)
     end
 
-    add_check_gteq(OrderItem::TABLE_NAME, "amount", 1)
+    add_check_gteq(table_for(OrderItem), "amount", 1)
 
-    create UserStoreDeliveryPoint::TABLE_NAME do
+    create table_for(UserStoreDeliveryPoint) do
       primary_key id : Int32
       add_timestamps
       add_belongs_to user : User, on_delete: :cascade, foreign_key_type: Int32
@@ -156,7 +156,7 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
       add hidden : Bool, default: false
     end
 
-    create UserAddressDeliveryPoint::TABLE_NAME do
+    create table_for(UserAddressDeliveryPoint) do
       primary_key id : Int32
       add_timestamps
       add_belongs_to user : User, on_delete: :cascade, foreign_key_type: Int32
@@ -168,19 +168,19 @@ class Setup::V20190502201320 < Avram::Migrator::Migration::V1
 
   def rollback
     [
-      UserAddressDeliveryPoint::TABLE_NAME,
-      UserStoreDeliveryPoint::TABLE_NAME,
-      OrderItem::TABLE_NAME,
-      UserOrder::TABLE_NAME,
-      StoreOrder::TABLE_NAME,
-      GoodsInStore::TABLE_NAME,
-      Store::TABLE_NAME,
-      Address::TABLE_NAME,
-      User::TABLE_NAME,
-      GoodsCategory::TABLE_NAME,
-      Good::TABLE_NAME,
-      Unit::TABLE_NAME,
-      Category::TABLE_NAME
+      table_for(UserAddressDeliveryPoint),
+      table_for(UserStoreDeliveryPoint),
+      table_for(OrderItem),
+      table_for(UserOrder),
+      table_for(StoreOrder),
+      table_for(GoodsInStore),
+      table_for(Store),
+      table_for(Address),
+      table_for(User),
+      table_for(GoodsCategory),
+      table_for(Good),
+      table_for(Unit),
+      table_for(Category)
     ].each do |table|
       drop table
     end

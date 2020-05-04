@@ -2,9 +2,9 @@ require "./store.cr"
 require "./user.cr"
 
 class StoreOrder < BaseModel
-  table :store_orders do
+  table do
     # TODO: has_many_polymorphic order_items : OrderItem, :order
-    
+
     belongs_to store : Store
     belongs_to user : User
 

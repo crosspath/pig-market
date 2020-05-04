@@ -87,37 +87,12 @@ class Db::CreateSampleSeeds < LuckyCli::Task
       z = [DataGenerator.count, 2].max.times.map { DataGenerator.name }.to_a
       bd = DataGenerator.true? ? nil : Time.utc.shift(days: DataGenerator.count * 20)
 
-      # Cannot use UserBox, because `password` is a virtual field in UserForm,
-      # that is not available in User::BaseForm (used by UserBox < Avram::Box).
-      # Also, instantiating UserForm in UserBox crashes Crystal:
-      #
-      # Invalid memory access (signal 11) at address 0x0
-      # [0x5645407f4f16] *CallStack::print_backtrace:Int32 +118
-      # [0x5645407c0360] __crystal_sigfault_handler +192
-      # [0x7f5b06c93dd0] ???
-      # [0x5645407aaca0] __crystal_main +24384
-      # [0x564540a69a49] *Crystal::main_user_code<Int32, Pointer(Pointer(UInt8))>:Nil +9
-      # [0x564540a699a9] *Crystal::main<Int32, Pointer(Pointer(UInt8))>:Int32 +41
-      # [0x5645407b7076] main +6
-      # [0x7f5b0684a09b] __libc_start_main +235
-      # [0x5645407a4c9a] _start +42
-      # [0x0] ???
-      #
-      # This problem relates to representing @@fillable_param_keys in Avram::Form
-
-      user_params = {
-        "login"      => login,
-        "password"   => DataGenerator.password,
-        "first_name" => z.first,
-        "last_name"  => z.last,
-        "full_name"  => z.join(" "),
-        "birth_date" => bd ? bd.to_rfc3339 : "",
-        "role"       => DataGenerator.true? ? "0": "1",
-        "bonuses"    => DataGenerator.shot? ? "100" : "0"
-      }
-      user = nil
-      UserForm.create(user_params) do |form, new_user|
-        user = new_user
+      user = UserBox.create do |a|
+        a.login(login).role(DataGenerator.true? ? 0.to_i16 : 1.to_i16)
+            .first_name(z.first).last_name(z.last).full_name(z.join(" "))
+            .crypted_password(UserForm.crypt_password(DataGenerator.password))
+            .birth_date(bd)
+            .bonuses(DataGenerator.shot? ? 100.to_i16 : 0.to_i16)
       end
 
       if user
@@ -250,7 +225,7 @@ class Db::CreateSampleSeeds < LuckyCli::Task
       new_bonuses_amount += order.earned_bonuses if order.earned_bonuses_state == 1
       new_bonuses_amount -= order.used_bonuses
 
-      user_params = {"bonuses" => new_bonuses_amount.to_s}
+      user_params = Avram::Params.new({"bonuses" => new_bonuses_amount.to_s})
 
       UserForm.update(user, user_params) do |f, b|
         raise "Not updated: UserForm, #{user_id}" unless b

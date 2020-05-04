@@ -1,5 +1,5 @@
 class Unit < BaseModel
-  table :units do
+  table do
     has_many goods : Good
 
     column name : String

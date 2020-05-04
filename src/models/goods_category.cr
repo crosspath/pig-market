@@ -5,7 +5,7 @@ require "./good.cr"
 require "./category.cr"
 
 class GoodsCategory < BaseModel
-  table :goods_categories do
+  table do
     belongs_to good : Good
     belongs_to category : Category
   end

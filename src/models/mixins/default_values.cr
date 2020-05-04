@@ -15,7 +15,11 @@ class Avram::Model
             type: PG::Numeric,
             convertor: Float64Convertor,
           {% else %}
+            {% if column[:type].is_a?(Generic) %}
+            type: {{column[:type]}},
+            {% else %}
             type: {{column[:type]}}::Lucky::ColumnType,
+            {% end %}
             {% if DEFAULT_VALUES[column[:name].symbolize] != nil %}
               default: {{ DEFAULT_VALUES[column[:name].symbolize] }},
               # BUG: one variable DEFAULT_VALUES is used for all classes based on

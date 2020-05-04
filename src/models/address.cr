@@ -1,12 +1,15 @@
 class Address < BaseModel
-  table :addresses do
+  table do
     has_many stores : Store
     has_many user_address_delivery_points : UserAddressDeliveryPoint
 
     column city : String
     column street : String
     column building : String
+  end
 
-    default({street: "", building: ""})
+  macro add_default_columns
+    column street : String
+    column building : String
   end
 end

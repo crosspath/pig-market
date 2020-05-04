@@ -4,13 +4,17 @@ class UserForm < User::SaveOperation
 
   before_save do
     if password.value
-      crypto = Crypto::Bcrypt::Password.create(password.value.as(String), cost: 10)
-      crypted_password.value = crypto.to_s
+      string = password.value.as(String)
+      crypted_password.value = UserForm.crypt_password(string)
     end
 
     if full_name.value.blank?
       full_name.value = "#{last_name.value} #{first_name.value}"
     end
+  end
+
+  def self.crypt_password(password : String)
+    Crypto::Bcrypt::Password.create(password, cost: 10).to_s
   end
 
   def set_birth_date_from_param(_value)

@@ -5,12 +5,14 @@ require "./good.cr"
 require "./store.cr"
 
 class GoodsInStore < BaseModel
-  table :goods_in_stores do
+  table do
     belongs_to good : Good
     belongs_to store : Store
-    
-    column amount : Int16
 
-    default({amount: 1.to_i16})
+    column amount : Int16
+  end
+
+  macro add_default_columns
+    column amount : Int16
   end
 end
