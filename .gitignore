@@ -8,3 +8,6 @@ start_server
 *.local.cr
 .env
 /tmp
+
+.directory
+.DS_Store
