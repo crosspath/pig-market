@@ -8,7 +8,7 @@ class Avram::Model
     {% nilable = type.types.includes?(Nil) %}
     column {{ var }}_type : String{% if nilable %}?{% end %}
     column {{ var }}_id : Int32{% if nilable %}?{% end %}
-    
+
     # Based on avram/src/avram/associations.cr, define_belongs_to_private_assoc_getter
     private def get_{{ var }}(allow_lazy : Bool = false) : {{ type }}
       if _{{ var }}_preloaded?
@@ -62,7 +62,8 @@ class Avram::Model
           preload_query = Hash(String, Avram::Query).new
           values = Hash(String, Hash(Int32, {{ type }})).new
           {% for tn in type.types %}
-            preload_query[{{ tn.stringify }}] = {{ tn }}::BaseQuery.new.id.in(ids[{{ tn.stringify }}])
+            preload_query[{{ tn.stringify }}] =
+                {{ tn }}::BaseQuery.new.id.in(ids[{{ tn.stringify }}])
             values[{{ tn.stringify }}] = preload_query[{{ tn.stringify }}].results.group_by(&.id)
           {% end %}
           records.each do |record|

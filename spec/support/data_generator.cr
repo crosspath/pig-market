@@ -40,7 +40,7 @@ module DataGenerator
   def true?
     rand(2) == 1
   end
-  
+
   # russian roulette
   def shot?
     rand(6) == 0

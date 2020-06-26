@@ -51,6 +51,10 @@ private def secret_key_from_env
 end
 
 private def raise_missing_secret_key_in_production
-  puts "Please set the SECRET_KEY_BASE environment variable. You can generate a secret key with 'lucky gen.secret_key'".colorize.red
+  message = <<-MSG
+    Please set the SECRET_KEY_BASE environment variable.
+    You can generate a secret key with 'lucky gen.secret_key'
+  MSG
+  puts message.colorize.red
   exit(1)
 end
