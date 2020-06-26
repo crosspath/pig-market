@@ -174,12 +174,22 @@ class Db::CreateSampleSeeds < LuckyCli::Task
     {dp_type, dp_id}
   end
 
-  private def create_user_order(customer_ids, goods, user_d_points, store_ids, address_ids)
+  private def cost_and_weight(goods, amounts)
+    tuples = goods.map_with_index { |g, i| {g.price, g.weight, i.to_i16} }
+
+    total_cost   = tuples.reduce(0.0) { |acc, (el, _, i)| acc + el * amounts[i] }
+    total_weight = tuples.reduce(0.0) { |acc, (_, el, i)| acc + el * amounts[i] }
+
+    [total_cost, total_weight]
+  end
+
+  private def create_user_order(
+    customer_ids, goods, amounts, user_d_points, store_ids, address_ids
+  )
     user_id = customer_ids.sample
     user = UserQuery.find(user_id)
 
-    total_cost = goods.reduce(0.0) { |acc, el| acc + el.price }
-    total_weight = goods.reduce(0.0) { |acc, el| acc + el.weight }
+    total_cost, total_weight = cost_and_weight(goods, amounts)
 
     order = UserOrderBox.create do |a|
       planned_date = if DataGenerator.shot?
@@ -197,8 +207,8 @@ class Db::CreateSampleSeeds < LuckyCli::Task
       planned_time = planned_date ? DataGenerator.count.to_i16 : nil
       planned_time = nil if planned_time && planned_time > 2
 
-      total_cost += (DataGenerator.count.to_f - 2.0).abs
-      total_weight += DataGenerator.count.to_f
+      total_cost += (DataGenerator.count.to_f - 2.0).abs if DataGenerator.true?
+      total_weight += DataGenerator.count.to_f if DataGenerator.true?
 
       dp_type, dp_id = find_or_create_delivery_point(
         user_id, user_d_points, store_ids, address_ids
@@ -235,11 +245,11 @@ class Db::CreateSampleSeeds < LuckyCli::Task
     order
   end
 
-  private def create_store_order(worker_ids, goods, store_ids)
+  private def create_store_order(worker_ids, goods, amounts, store_ids)
     user_id = worker_ids.sample
-    total_cost = goods.reduce(0.0) { |acc, el| acc + el.price }
-    total_weight = goods.reduce(0.0) { |acc, el| acc + el.weight }
     store = store_ids.sample
+
+    total_cost, total_weight = cost_and_weight(goods, amounts)
 
     order = StoreOrderBox.create do |a|
       planned_date = if DataGenerator.shot?
@@ -254,8 +264,8 @@ class Db::CreateSampleSeeds < LuckyCli::Task
         nil
       end
 
-      total_cost += DataGenerator.count.to_f - 2.0
-      total_weight += DataGenerator.count.to_f
+      total_cost += (DataGenerator.count.to_f - 2.0).abs if DataGenerator.true?
+      total_weight += DataGenerator.count.to_f if DataGenerator.true?
 
       a.store_id(store).user_id(user_id)
           .planned_delivery_date(planned_date).delivered_at(actual_ts)
@@ -265,13 +275,13 @@ class Db::CreateSampleSeeds < LuckyCli::Task
     order
   end
 
-  private def create_order_items(order, goods, store_ids)
-    goods.each do |good|
+  private def create_order_items(order, goods, amounts, store_ids)
+    goods.each_with_index do |good, i|
       OrderItemBox.create do |a|
         s = DataGenerator.true? ? store_ids.sample : nil
         g = DataGenerator.shot? ? nil : good.id
         pr = DataGenerator.shot? ? good.price - 0.3 : good.price
-        am = DataGenerator.count.to_i16
+        am = amounts[i]
         wm = DataGenerator.price
         w = am * good.weight * (wm - wm.floor + 0.8)
 
@@ -350,18 +360,22 @@ class Db::CreateSampleSeeds < LuckyCli::Task
       10.times do
         select_good_ids = DataGenerator.count.times.map { good_ids.sample }.to_a
         goods = GoodQuery.new.id.in(select_good_ids)
+        amounts = goods.map { DataGenerator.count.to_i16 }
 
-        order = create_user_order(customer_ids, goods, user_d_points, store_ids, address_ids)
-        create_order_items(order, goods, store_ids)
+        order = create_user_order(
+          customer_ids, goods, amounts, user_d_points, store_ids, address_ids
+        )
+        create_order_items(order, goods, amounts, store_ids)
       end
 
       puts "Creating store orders"
       10.times do
         select_good_ids = DataGenerator.count.times.map { good_ids.sample }.to_a
         goods = GoodQuery.new.id.in(select_good_ids)
+        amounts = goods.map { DataGenerator.count.to_i16 }
 
-        order = create_store_order(worker_ids, goods, store_ids)
-        create_order_items(order, goods, store_ids)
+        order = create_store_order(worker_ids, goods, amounts, store_ids)
+        create_order_items(order, goods, amounts, store_ids)
       end
 
       true
