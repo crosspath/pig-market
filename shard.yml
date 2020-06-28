@@ -1,5 +1,5 @@
 name: pig_market
-version: 0.1.4
+version: 0.1.5
 
 authors:
   - Evgeniy Nochevnov <xpath@e1.ru>
@@ -8,7 +8,7 @@ targets:
   pig_market:
     main: src/pig_market.cr
 
-crystal: 0.34.0
+crystal: 0.35.1
 
 dependencies:
   lucky:
