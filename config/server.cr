@@ -12,9 +12,9 @@ Lucky::Server.configure do |settings|
     # For a full list look in
     # https://github.com/luckyframework/lucky/blob/master/src/lucky/server.cr
     # To add additional extensions do something like this:
-    # config.gzip_content_types << "content/type"
+    # settings.gzip_content_types << "content/type"
   else
-    settings.secret_key_base = "l0iuOb/WrBVgUERHCySbmnv0aHG/hZyyxqRvsLSJkGs="
+    settings.secret_key_base = "lR8NKZdW1XeeJzrXAk2vZN9h9PTeZu9OjKbKtZbgPTU="
     # Change host/port in config/watch.yml
     # Alternatively, you can set the DEV_PORT env to set the port for local development
     settings.host = Lucky::ServerSettings.host
@@ -51,10 +51,6 @@ private def secret_key_from_env
 end
 
 private def raise_missing_secret_key_in_production
-  message = <<-MSG
-    Please set the SECRET_KEY_BASE environment variable.
-    You can generate a secret key with 'lucky gen.secret_key'
-  MSG
-  puts message.colorize.red
+  puts "Please set the SECRET_KEY_BASE environment variable. You can generate a secret key with 'lucky gen.secret_key'".colorize.red
   exit(1)
 end
