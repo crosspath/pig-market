@@ -10,8 +10,4 @@ class UserStoreDeliveryPoint < BaseModel
 
     column hidden : Bool
   end
-
-  macro add_default_columns
-    column hidden : Bool
-  end
 end

@@ -15,8 +15,4 @@ class Good < BaseModel
     column price : Float64
     column weight : Float64
   end
-
-  macro add_default_columns
-    column description : String
-  end
 end

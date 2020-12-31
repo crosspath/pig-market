@@ -1,24 +1,19 @@
 class Api::Users::Bonuses < ApiAction
   get "/api/users/:user_id/bonuses" do
-    address_dp = UserAddressDeliveryPointQuery.new.user_id(user_id).results.map(&.id).to_a
-    store_dp = UserStoreDeliveryPointQuery.new.user_id(user_id).results.map(&.id).to_a
+    address_dp = UserAddressDeliveryPointQuery.new.for_user(user_id)
+    store_dp = UserStoreDeliveryPointQuery.new.for_user(user_id)
 
-    w = [] of Tuple(String, Array(Int32))
-    add_sql_where_delivery_point(w, UserAddressDeliveryPoint.name, address_dp)
-    add_sql_where_delivery_point(w, UserStoreDeliveryPoint.name, store_dp)
-
-    if w.empty?
-      earned = [] of UserOrder
-      used   = [] of UserOrder
-    else
-      where_clause = w.map(&.first).join(" OR ")
-      where_values = w.flat_map(&.last)
-
+    earned = [] of UserOrder
+    used   = [] of UserOrder
+    if !address_dp.empty? || !store_dp.empty?
       earned_query = UserOrderQuery.new.created_at.asc_order.earned_bonuses.gt(0.to_i16)
       used_query   = UserOrderQuery.new.created_at.asc_order.used_bonuses.gt(0.to_i16)
 
-      earned = earned_query.where_in(where_clause, where_values).results
-      used = used_query.where_in(where_clause, where_values).results
+      earned_query = earned_query.delivery_point(address: address_dp, store: store_dp)
+      used_query   = used_query.delivery_point(address: address_dp, store: store_dp)
+
+      earned = earned_query.results
+      used   = used_query.results
     end
 
     user = UserQuery.find(user_id)
@@ -29,17 +24,6 @@ class Api::Users::Bonuses < ApiAction
     response_success(bonuses: result)
   rescue e
     response_error(500, e)
-  end
-
-  private def add_sql_where_delivery_point(
-    list : Array(Tuple(String, Array(Int32))),
-    class_name : String,
-    ids : Array(Int32)
-  )
-    unless ids.empty?
-      q = "?" + ",?" * (ids.size - 1)
-      list << {"(delivery_point_type = '#{class_name}' and delivery_point_id in (" + q + "))", ids}
-    end
   end
 end
 

@@ -8,11 +8,6 @@ class Category < BaseModel
     column description : String
   end
 
-  macro add_default_columns
-    column path : String
-    column description : String
-  end
-
   def child_path
     self.path.blank? ? self.id.to_s : "#{self.path}.#{self.id}"
   end

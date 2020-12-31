@@ -11,8 +11,4 @@ class GoodsInStore < BaseModel
 
     column amount : Int16
   end
-
-  macro add_default_columns
-    column amount : Int16
-  end
 end

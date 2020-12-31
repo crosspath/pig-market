@@ -13,15 +13,6 @@ class User < BaseModel
     column role : Int16
   end
 
-  macro add_default_columns
-    column first_name : String
-    column last_name : String
-    column full_name : String
-    column birth_date : Time?
-    column bonuses : Int16
-    column role : Int16
-  end
-
   enum UserRole : Int16
     Customer
     Worker

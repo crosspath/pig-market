@@ -5,7 +5,7 @@ class UserOrder < BaseModel
   table do
     # TODO: has_many_polymorphic order_items : OrderItem, :order
 
-    polymorphic delivery_point : UserStoreDeliveryPoint | UserAddressDeliveryPoint
+    typical_polymorphic delivery_point : UserStoreDeliveryPoint | UserAddressDeliveryPoint
     # column delivery_point_type : String
     # column delivery_point_id : Int32
 
@@ -16,11 +16,6 @@ class UserOrder < BaseModel
     column planned_delivery_time_interval : Int16?
     column used_bonuses : Int16
     column earned_bonuses : Int16
-    column earned_bonuses_state : Int16
-  end
-
-  macro add_default_columns
-    column used_bonuses : Int16
     column earned_bonuses_state : Int16
   end
 

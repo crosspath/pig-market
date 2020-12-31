@@ -15,10 +15,6 @@ class Store < BaseModel
     column address_notes : String
   end
 
-  macro add_default_columns
-    column type : Int16
-  end
-
   enum StoreType : Int16
     Shop
     Storehouse

@@ -11,9 +11,4 @@ class UserAddressDeliveryPoint < BaseModel
     column address_notes : String
     column hidden : Bool
   end
-
-  macro add_default_columns
-    column address_notes : String
-    column hidden : Bool
-  end
 end

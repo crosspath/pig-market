@@ -7,9 +7,4 @@ class Address < BaseModel
     column street : String
     column building : String
   end
-
-  macro add_default_columns
-    column street : String
-    column building : String
-  end
 end

@@ -1,3 +1,4 @@
+# Based on avram/src/avram/join.cr, Avram::Join
 module PolymorphicJoin
   extend Avram::Join
 
