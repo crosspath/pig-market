@@ -4,7 +4,7 @@ class Store < BaseModel
   table do
     has_many order_items : OrderItem
     has_many goods_in_stores : GoodsInStore
-    has_many goods : Good, through: [:goods_in_stores, :goods]
+    has_many goods : Good, through: [:goods_in_stores, :good]
     has_many store_orders : StoreOrder
     has_many user_store_delivery_points : UserStoreDeliveryPoint
 

@@ -13,9 +13,9 @@ class UserOrderQuery < UserOrder::BaseQuery
 
     w.each_with_index do |(type, ids), i|
       if i == 0
-        query = query.polymorphic_where_in(:delivery_point, type, *ids)
+        query = query.polymorphic_where_in(:delivery_point, type, ids)
       else
-        query = query.or(&.polymorphic_where_in(:delivery_point, type, *ids))
+        query = query.or(&.polymorphic_where_in(:delivery_point, type, ids))
       end
     end
 

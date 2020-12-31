@@ -54,7 +54,7 @@ CREATE DATABASE pig_db OWNER pig_user;
    delete `.template`, press `Enter/Return` and then press `Ctrl+X`.
 4. Run `shards install` to download required libraries
 5. Run `lucky db.migrate` to create tables in the database
-6. Run `lucky db.create_sample_seeds` to generate sample rows
+6. Run `lucky db.seed.sample_data` to generate sample rows
 7. Run `lucky dev` to start the app
 
 Done!
