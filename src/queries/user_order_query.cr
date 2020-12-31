@@ -1,13 +1,13 @@
 require "../models/user_order.cr"
-require "mixins/polymorphic_where.cr"
+require "./mixins/polymorphic_where.cr"
 
 class UserOrderQuery < UserOrder::BaseQuery
   include PolymorphicWhere
 
   def delivery_point(address : Array(Int32), store : Array(Int32))
     w = [] of Tuple(String, Array(Int32))
-    w << (UserAddressDeliveryPoint.name, address) unless address.empty?
-    w << (UserStoreDeliveryPoint.name, store) unless store.empty?
+    w << {UserAddressDeliveryPoint.name, address} unless address.empty?
+    w << {UserStoreDeliveryPoint.name, store} unless store.empty?
 
     query = self
 

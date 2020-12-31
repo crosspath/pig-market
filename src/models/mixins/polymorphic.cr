@@ -49,7 +49,7 @@ class Avram::Model
     end
 
     # Based on avram/src/avram/associations/belongs_to.cr, define_belongs_to_base_query
-    class BaseQuery < Avram::Query
+    class BaseQuery
       def preload_{{ var }}
         add_preload do |records|
           ids = Hash(String, Array(Int32)).new { |hash, key| hash[key] = [] of Int32 }
