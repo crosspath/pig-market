@@ -1,7 +1,7 @@
 class Category < BaseModel
   table do
     has_many goods_categories : GoodsCategory
-    has_many goods : Good, :goods_categories # has_many through
+    has_many goods : Good, through: [:goods_categories, :goods]
 
     column path : String
     column name : String

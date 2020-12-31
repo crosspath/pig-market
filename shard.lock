@@ -2,11 +2,11 @@ version: 2.0
 shards:
   authentic:
     git: https://github.com/luckyframework/authentic.git
-    version: 0.6.1
+    version: 0.7.1
 
   avram:
     git: https://github.com/luckyframework/avram.git
-    version: 0.16.0
+    version: 0.18.2
 
   blank:
     git: https://github.com/kostya/blank.git
@@ -17,12 +17,12 @@ shards:
     version: 0.1.2
 
   cry:
-    git: https://github.com/luckyframework/cry.git
+    git: https://github.com/paulcsmith/cry.git
     version: 0.4.2
 
   db:
     git: https://github.com/crystal-lang/crystal-db.git
-    version: 0.9.0
+    version: 0.10.0
 
   dexter:
     git: https://github.com/luckyframework/dexter.git
@@ -46,19 +46,23 @@ shards:
 
   lucky:
     git: https://github.com/luckyframework/lucky.git
-    version: 0.23.0
+    version: 0.25.0
 
   lucky_cli:
-    git: https://github.com/luckyframework/lucky_cli.git
-    version: 0.23.0
+    git: https://github.com/luckyframework/cli.git
+    version: 0.25.0
 
   lucky_router:
-    git: https://github.com/luckyframework/lucky_router.git
-    version: 0.3.0
+    git: https://github.com/luckyframework/router.git
+    version: 0.4.0
 
   pg:
     git: https://github.com/will/crystal-pg.git
-    version: 0.21.1
+    version: 0.22.1
+
+  pulsar:
+    git: https://github.com/luckyframework/pulsar.git
+    version: 0.2.1
 
   shell-table:
     git: https://github.com/luckyframework/shell-table.cr.git
@@ -70,5 +74,5 @@ shards:
 
   wordsmith:
     git: https://github.com/luckyframework/wordsmith.git
-    version: 0.2.0
+    version: 0.2.1
 
