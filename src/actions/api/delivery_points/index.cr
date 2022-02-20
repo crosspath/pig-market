@@ -1,5 +1,5 @@
 class Api::DeliveryPoints::Index < ApiAction
-  route do
+  get "/api/delivery_points" do
     dp_results = DeliveryPointQuery.select_all
 
     result = SpecialApi::DeliveryPointsWithAddressSerializer.new(

@@ -1,5 +1,5 @@
 class Api::Addresses::Show < ApiAction
-  route do
+  get "/api/addresses/:address_id" do
     address_query = AddressQuery.new.preload_stores.preload_user_address_delivery_points
 
     address = address_query.find(address_id)

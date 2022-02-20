@@ -1,4 +1,4 @@
-class UserOrderBox < Avram::Box
+class UserOrderFactory < Avram::Factory
   def initialize
     delivery_point_type "UserStoreDeliveryPoint"
     delivery_point_id 0

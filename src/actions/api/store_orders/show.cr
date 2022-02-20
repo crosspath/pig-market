@@ -1,5 +1,5 @@
 class Api::StoreOrders::Show < ApiAction
-  route do
+  get "/api/store_orders/:store_order_id" do
     order = StoreOrderQuery.new.preload_user.preload_store.find(store_order_id)
     items = OrderItemQuery.new.order_type(StoreOrder.name).order_id(store_order_id).results
 

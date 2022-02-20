@@ -1,4 +1,4 @@
-class UnitBox < Avram::Box
+class UnitFactory < Avram::Factory
   def initialize
     name ""
   end

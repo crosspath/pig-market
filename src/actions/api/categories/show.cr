@@ -1,5 +1,5 @@
 class Api::Categories::Show < ApiAction
-  route do
+  get "/api/categories/:category_id" do
     category = CategoryQuery.new.find(category_id)
     child_path = category.child_path
     parent_ids = category.path.empty? ? nil : category.path.split(".")

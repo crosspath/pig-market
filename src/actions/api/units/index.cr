@@ -1,5 +1,5 @@
 class Api::Units::Index < ApiAction
-  route do
+  get "/api/units" do
     units = UnitQuery.new.name.asc_order
 
     result = Api::UnitSerializer.for_collection(units)

@@ -1,5 +1,5 @@
 class Api::Stores::Show < ApiAction
-  route do
+  get "/api/stores/:store_id" do
     store_query = StoreQuery.new.
         preload_address.
         preload_order_items.

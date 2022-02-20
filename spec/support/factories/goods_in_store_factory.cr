@@ -1,4 +1,4 @@
-class GoodsInStoreBox < Avram::Box
+class GoodsInStoreFactory < Avram::Factory
   def initialize
     good_id 0
     store_id 0

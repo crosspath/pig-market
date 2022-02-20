@@ -1,5 +1,5 @@
 class Api::Goods::Show < ApiAction
-  route do
+  get "/api/goods/:good_id" do
     query = GoodQuery.new
     query = query.preload_categories.preload_unit.preload_order_items.preload_goods_in_stores
 

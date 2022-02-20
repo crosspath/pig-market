@@ -1,5 +1,5 @@
 class Api::Goods::Index < ApiAction
-  route do
+  get "/api/goods" do
     goods = GoodQuery.new.name.asc_order
 
     result = Api::GoodSerializer.for_collection(goods)

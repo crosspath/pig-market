@@ -1,4 +1,4 @@
-class OrderItemBox < Avram::Box
+class OrderItemFactory < Avram::Factory
   def initialize
     order_type "UserOrder"
     order_id 0

@@ -1,4 +1,4 @@
-class StoreBox < Avram::Box
+class StoreFactory < Avram::Factory
   def initialize
     type 0
     name ""

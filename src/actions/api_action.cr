@@ -5,6 +5,10 @@ abstract class ApiAction < Lucky::Action
   disable_cookies
   accepted_formats [:json]
 
+  # By default all actions are required to use underscores to separate words.
+  # Add 'include Lucky::SkipRouteStyleCheck' to your actions if you wish to ignore this check for specific routes.
+  include Lucky::EnforceUnderscoredRoute
+
   before check_api_key
 
   protected def check_api_key

@@ -1,4 +1,4 @@
-class CategoryBox < Avram::Box
+class CategoryFactory < Avram::Factory
   def initialize
     path ""
     name ""

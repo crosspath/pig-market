@@ -1,11 +1,11 @@
-require "../../../spec/support/boxes/**"
+require "../../../spec/support/factories/**"
 require "../../../spec/support/data_generator.cr"
 
 # Add sample data helpful for development, e.g. (fake users, blog posts, etc.)
 #
 # Use `Db::Seed::RequiredData` if you need to create data *required* for your
 # app to work.
-class Db::Seed::SampleData < LuckyCli::Task
+class Db::Seed::SampleData < LuckyTask::Task
   summary "Add sample database records helpful for development"
 
   private def create_categories
@@ -14,7 +14,7 @@ class Db::Seed::SampleData < LuckyCli::Task
     category_path2 = [] of String
 
     10.times do
-      category = CategoryBox.create do |a|
+      category = CategoryFactory.create do |a|
         path = case DataGenerator.count
         when 0..1
           ""
@@ -42,7 +42,7 @@ class Db::Seed::SampleData < LuckyCli::Task
     unit_ids = [] of Int32
 
     10.times do
-      unit = UnitBox.create &.name(DataGenerator.unit_name)
+      unit = UnitFactory.create &.name(DataGenerator.unit_name)
       unit_ids << unit.id
     end
 
@@ -53,7 +53,7 @@ class Db::Seed::SampleData < LuckyCli::Task
     good_ids = [] of Int32
 
     30.times do
-      good = GoodBox.create do |a|
+      good = GoodFactory.create do |a|
         u = DataGenerator.shot? ? nil : unit_ids.sample
         a.unit_id(u).name(DataGenerator.name).description(DataGenerator.text)
             .price(DataGenerator.price).weight(DataGenerator.price)
@@ -62,7 +62,7 @@ class Db::Seed::SampleData < LuckyCli::Task
 
       unless DataGenerator.shot?
         DataGenerator.count.times do
-          GoodsCategoryBox.create do |a|
+          GoodsCategoryFactory.create do |a|
             a.good_id(good.id).category_id(category_ids.sample)
           end
         end
@@ -87,7 +87,7 @@ class Db::Seed::SampleData < LuckyCli::Task
       z = [DataGenerator.count, 2].max.times.map { DataGenerator.name }.to_a
       bd = DataGenerator.true? ? nil : Time.utc.shift(days: DataGenerator.count * 20)
 
-      user = UserBox.create do |a|
+      user = UserFactory.create do |a|
         a.login(login).role(DataGenerator.true? ? 0.to_i16 : 1.to_i16)
             .first_name(z.first).last_name(z.last).full_name(z.join(" "))
             .crypted_password(UserForm.crypt_password(DataGenerator.password))
@@ -111,7 +111,7 @@ class Db::Seed::SampleData < LuckyCli::Task
     address_ids = [] of Int32
 
     20.times do
-      address = AddressBox.create do |a|
+      address = AddressFactory.create do |a|
         z = 3.times.map { DataGenerator.name }.to_a
 
         a.city(z[0]).street(z[1]).building(z[2])
@@ -127,7 +127,7 @@ class Db::Seed::SampleData < LuckyCli::Task
     store_ids = [] of Int32
 
     12.times do
-      store = StoreBox.create do |a|
+      store = StoreFactory.create do |a|
         t = (DataGenerator.true? ? 0 : 1).to_i16
 
         a.type(t).name(DataGenerator.name)
@@ -141,7 +141,7 @@ class Db::Seed::SampleData < LuckyCli::Task
 
   private def create_goods_in_stores(good_ids, store_ids)
     30.times do
-      GoodsInStoreBox.create do |a|
+      GoodsInStoreFactory.create do |a|
         a.good_id(good_ids.sample).store_id(store_ids.sample)
             .amount(DataGenerator.count.to_i16)
       end
@@ -154,11 +154,11 @@ class Db::Seed::SampleData < LuckyCli::Task
 
     if user_d_points[user_id].empty? || DataGenerator.true?
       dp = if DataGenerator.true?
-        UserStoreDeliveryPointBox.create do |q|
+        UserStoreDeliveryPointFactory.create do |q|
           q.user_id(user_id).store_id(store_ids.sample).hidden(DataGenerator.true?)
         end
       else
-        UserAddressDeliveryPointBox.create do |q|
+        UserAddressDeliveryPointFactory.create do |q|
           q.user_id(user_id).address_id(address_ids.sample)
               .address_notes(DataGenerator.name).hidden(DataGenerator.true?)
         end
@@ -191,7 +191,7 @@ class Db::Seed::SampleData < LuckyCli::Task
 
     total_cost, total_weight = cost_and_weight(goods, amounts)
 
-    order = UserOrderBox.create do |a|
+    order = UserOrderFactory.create do |a|
       planned_date = if DataGenerator.shot?
         nil
       else
@@ -251,7 +251,7 @@ class Db::Seed::SampleData < LuckyCli::Task
 
     total_cost, total_weight = cost_and_weight(goods, amounts)
 
-    order = StoreOrderBox.create do |a|
+    order = StoreOrderFactory.create do |a|
       planned_date = if DataGenerator.shot?
         nil
       else
@@ -277,7 +277,7 @@ class Db::Seed::SampleData < LuckyCli::Task
 
   private def create_order_items(order, goods, amounts, store_ids)
     goods.each_with_index do |good, i|
-      OrderItemBox.create do |a|
+      OrderItemFactory.create do |a|
         s = DataGenerator.true? ? store_ids.sample : nil
         g = DataGenerator.shot? ? nil : good.id
         pr = DataGenerator.shot? ? good.price - 0.3 : good.price

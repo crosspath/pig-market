@@ -1,5 +1,5 @@
 class Api::Users::Show < ApiAction
-  route do
+  get "/api/users/:user_id" do
     user = UserQuery.find(user_id)
 
     result = Api::UserSerializer.new(user)

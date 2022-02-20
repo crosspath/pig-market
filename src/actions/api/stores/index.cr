@@ -1,5 +1,5 @@
 class Api::Stores::Index < ApiAction
-  route do
+  get "/api/stores" do
     stores = StoreQuery.new.name.asc_order
 
     result = Api::StoreSerializer.for_collection(stores)

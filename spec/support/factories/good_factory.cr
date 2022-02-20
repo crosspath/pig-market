@@ -1,4 +1,4 @@
-class GoodBox < Avram::Box
+class GoodFactory < Avram::Factory
   def initialize
     name ""
     unit_id 0

@@ -1,5 +1,5 @@
 class Api::Categories::Index < ApiAction
-  route do
+  get "/api/categories" do
     categories = CategoryQuery.new.name.asc_order
 
     result = Api::CategorySerializer.for_collection(categories)

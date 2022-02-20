@@ -1,5 +1,5 @@
 class Api::Users::Index < ApiAction
-  route do
+  get "/api/users" do
     users = UserQuery.new.login.asc_order
 
     result = Api::UserSerializer.for_collection(users)

@@ -6,10 +6,6 @@ class AppServer < Lucky::BaseAppServer
       Lucky::ForceSSLHandler.new,
       Lucky::HttpMethodOverrideHandler.new,
       Lucky::LogHandler.new,
-
-      # Disabled in API mode, but can be enabled if you need them:
-      # Lucky::SessionHandler.new,
-      # Lucky::FlashHandler.new,
       Lucky::ErrorHandler.new(action: Errors::Show),
       CORSHandler.new,
       Lucky::RemoteIpHandler.new,
@@ -17,7 +13,7 @@ class AppServer < Lucky::BaseAppServer
 
       # Disabled in API mode:
       # Lucky::StaticCompressionHandler.new("./public", file_ext: "gz", content_encoding: "gzip"),
-      # Lucky::StaticFileHandler.new("./public", false),
+      # Lucky::StaticFileHandler.new("./public", fallthrough: false, directory_listing: false),
       Lucky::RouteNotFoundHandler.new,
     ] of HTTP::Handler
   end

@@ -1,4 +1,4 @@
-class AddressBox < Avram::Box
+class AddressFactory < Avram::Factory
   def initialize
     city ""
     street ""

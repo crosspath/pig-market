@@ -1,5 +1,5 @@
 class Api::UserOrders::Index < ApiAction
-  route do
+  get "/api/user_orders" do
     orders = UserOrderQuery.new.created_at.asc_order
 
     result = Api::UserOrderSerializer.for_collection(orders)

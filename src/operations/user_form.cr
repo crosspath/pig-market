@@ -1,3 +1,5 @@
+require "crypto/bcrypt/password"
+
 class UserForm < User::SaveOperation
   permit_columns login, first_name, last_name, full_name, birth_date, bonuses, role
   attribute password : String

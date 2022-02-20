@@ -1,5 +1,5 @@
 class Api::Addresses::Index < ApiAction
-  route do
+  get "/api/addresses" do
     addresses = AddressQuery.new.city.asc_order
 
     result = Api::AddressSerializer.for_collection(addresses)

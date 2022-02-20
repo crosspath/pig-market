@@ -1,5 +1,5 @@
 class Api::UserOrders::Show < ApiAction
-  route do
+  get "/api/user_orders/:user_order_id" do
     order = UserOrderQuery.new.find(user_order_id)
     items = OrderItemQuery.new.order_type(UserOrder.name).order_id(user_order_id).results
 
